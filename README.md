@@ -8,15 +8,15 @@ In this project, I examined hate crimes against LGBTQI+ individuals in the U.S. 
 
 **Key Strengths**
 
-**Relevance of Topic:** The project addresses a socially significant issue.
+- **Relevance of Topic:** The project addresses a socially significant issue.
 
-**Use of ML Algorithms:** I have applied a variety of ML techniques (Decision Tree, Random Forest, K-Means, K-NN) to analyze the dataset.
+- **Use of ML Algorithms:** I have applied a variety of ML techniques (Decision Tree, Random Forest, K-Means, K-NN) to analyze the dataset.
 
-**Data Enrichment:** I have added external data (e.g., LGBTQI+ population, Gini Index, hate crime laws) to enhance the analysis.
+- **Data Enrichment:** I have added external data (e.g., LGBTQI+ population, Gini Index, hate crime laws) to enhance the analysis.
 
-**Visualizations:** The use of Tableau and Excel for visualizations adds a layer of clarity to the findings.
+- **Visualizations:** The use of Tableau and Excel for visualizations adds a layer of clarity to the findings.
 
-**CRISP-DM Methodology:** The structured approach to data mining is a strong point.
+- **CRISP-DM Methodology:** The structured approach to data mining is a strong point.
 
 
 
@@ -35,3 +35,11 @@ Step-by-step instructions for reproducing the analysis.
 
 ## Dependencies: 
 List of libraries and tools used (e.g., RStudio, Tableau).
+
+## Future Work: 
+
+- Integrating social media data for real-time hate crime prediction.
+
+- Exploring other ML techniques (e.g., neural networks, ensemble methods).
+
+- Expanding the analysis to other countries or regions.
