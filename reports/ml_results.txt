@@ -1,0 +1,54 @@
+========================================================================
+LGBTQI+ HATE CRIME ANALYSIS — MACHINE LEARNING RESULTS
+========================================================================
+
+1. K-Means Cluster Profiles (k=4):
+# A tibble: 4 × 5
+  CLUSTER MEAN_RATE_PER_100K_TOTAL MEAN_GINI_COEFFICIENT MEAN_VIOLENT_PCT     N
+  <fct>                      <dbl>                 <dbl>            <dbl> <int>
+1 1                          0.452                 0.450             65.6   462
+2 2                          0.391                 0.484             59.3   453
+3 3                          0.564                 0.457             25.6   597
+4 4                          7.66                  0.541             73.6    21
+------------------------------------------------------------------------
+
+2. Decision Tree
+# A tibble: 2 × 3
+  .metric  .estimator .estimate
+  <chr>    <chr>          <dbl>
+1 accuracy binary         0.604
+2 roc_auc  binary         0.398
+             Truth
+Prediction    Non-violent Violent
+  Non-violent        1822    1281
+  Violent             657    1131
+------------------------------------------------------------------------
+
+3. Random Forest (200 trees)
+# A tibble: 2 × 3
+  .metric  .estimator .estimate
+  <chr>    <chr>          <dbl>
+1 accuracy binary         0.640
+2 roc_auc  binary         0.320
+             Truth
+Prediction    Non-violent Violent
+  Non-violent        1566     847
+  Violent             913    1565
+------------------------------------------------------------------------
+
+4. RF Feature Importance:
+# A tibble: 10 × 2
+   Feature                      Importance
+   <chr>                             <dbl>
+ 1 "Gini"                            23.0 
+ 2 "Log_total_pop"                   20.8 
+ 3 "Law_level"                       17.1 
+ 4 "Data_year"                       14.5 
+ 5 "Anti Transgender"                14.4 
+ 6 "Anti Gay  Male "                 14.3 
+ 7 "Anti Gender Non Conforming"      11.2 
+ 8 "Anti Lesbian"                     7.84
+ 9 "Anti Lgbtq  General "             5.64
+10 "New"                              0   
+------------------------------------------------------------------------
+

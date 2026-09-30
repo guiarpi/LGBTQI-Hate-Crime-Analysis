@@ -1,0 +1,64 @@
+# ── Large source data ────────────────────────────────────────────────
+# FBI UCR master file (68 MB) — exceeds GitHub's comfortable file size.
+# Download instructions are in README.md → "Getting the source data".
+data/hate_crime.csv
+
+# ── Regenerable pipeline outputs ─────────────────────────────────────
+# Rebuilt in ~5 seconds by 01_data_pipeline.R. Not worth versioning.
+data/lgbtq_hate_crimes_full.csv
+data/lgbtq_hate_crimes_enriched.csv
+
+# Kept deliberately (134 KB, primary Tableau source):
+#   data/state_year_aggregate.csv
+# Kept deliberately (reference datasets built by the Python scripts):
+#   data/gini_index_1991_2024.csv
+#   data/total_population_1991_2024.csv
+#   data/lgbt_population_2012_2024.csv
+#   data/state_lgbt_laws.csv
+#   data/state_law_panel.csv
+
+# ── R / RStudio ──────────────────────────────────────────────────────
+.Rproj.user/
+.Rhistory
+.Rapp.history
+.RData
+.Ruserdata
+*.Rproj
+
+# knitr / rmarkdown intermediates
+*_cache/
+*_files/
+!charts/
+.knit.md
+.utf8.md
+
+# ── Python ───────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# ── Tableau ──────────────────────────────────────────────────────────
+# Packaged workbooks bundle their data and bloat the repo.
+# The unpackaged .twb is kept; .twbx is not.
+*.twbx
+# Tableau temp/backup artefacts
+*.twb.bak
+*.tde
+*.hyper
+
+# ── Private / not for publication ────────────────────────────────────
+# Kept on disk locally, never committed. Contains the original college
+# submission (student number + institutional email) and the internal
+# Tableau build guide used to construct the dashboard.
+_private/
+
+# ── OS / editor ──────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*~
+*.swp

@@ -1,0 +1,16 @@
+“Hate Crimes,” The United States Department of Justice, May 10, 2021, https://www.justice.gov/hatecrimes.
+“Hate Crimes Case Examples,” The United States Department of Justice, May 4, 2021, https://www.justice.gov/hatecrimes/hate-crimes-case-examples.
+Bias-Related Crimes (Hate Crimes) Data. Accessed May 14, 2021, https://mpdc.dc.gov/hatecrimes.
+Miller, Michael E., 2019, “The Victims of D.C.’s Record Year of Hatred,” The Washington Post, Aug. 21, https://www.washingtonpost.com/graphics/2019/local/dc-hate-crimes/.
+Sullivan, Kate, 2020, “Yang: Asian Americans Being Attacked over Coronavirus Is ‘Heartbreaking,” CNN, April 3, https://www.cnn.com/2020/04/02/politics/andrew-yang-asian-americans-attacked-coronavirus/index.html.
+Budiman, Abby, and Neil G. Ruiz, 2021, “Key Facts about Asian Americans, a Diverse and Growing Population,” Pew Research Center, May 3, https://www.pewresearch.org/fact-tank/2021/04/29/key-facts-about-asian-americans/.
+Yam, Kimmy, 2021, “Anti-Asian Hate Crimes Increased by Nearly 150% in 2020, Mostly in N.Y. and L.A., New Report Says,” NBC News, March 9, https://www.nbcnews.com/news/asian-america/anti-asian-hate-crimes-increased-nearly-150-2020-mostly-n-n1260264.
+Jeung, Russell, Aggie Yellow Horse, Tara Popovic and Richard Lim, 2021, “Stop AAPI Hate National Report,” Stop AAPI Hate, Feb. 2, https://stopaapihate.org/wp-content/uploads/2021/04/Stop-AAPI-Hate-National-Report-210316.pdf.
+Cathey, Libby, 2021, "House passes anti-Asian hate crimes bill, legislation awaits Biden's signature," ABC News, May 18.
+Wong, Phoebe and Robert Bennett, 2020, “Everything a Data Scientist Should Know About Data Management,” Towards Data Science, May 31, https://towardsdatascience.com/everything-a-data-scientist-should-know-about-data-management-6877788c6a42.
+“Increase in Online Hate Speech Leads to More Crimes against Minorities,” 2019, Cardiff University, Oct. 15, https://www.cardiff.ac.uk/news/view/1702622-increase-in-online-hate-speech-leads-to-more-crimes-against-minorities.
+Vestby, Annette, and Jonas Vestby, 2019, “Machine Learning and the Police: Asking the Right Questions,” Policing: A Journal of Policy and Practice, June 14, https://doi.org/10.1093/police/paz035.
+
+
+
+https://data.census.gov/cedsci/table?q=ACSDT1Y2019.B19083&g=0100000US.04000.001&tid=ACSDT1Y2019.B19083&hidePreview=false

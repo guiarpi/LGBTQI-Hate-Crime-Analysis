@@ -1,0 +1,820 @@
+"""
+build_law_dataset.py  (v2 — NV entries resolved; missing states added)
+=======================================================================
+Builds data/state_lgbt_laws.csv
+"""
+
+import csv
+from pathlib import Path
+
+BASE_DIR = Path(__file__).parent.parent / "LGBTQI-Hate-Crime-Analysis"
+OUT_PATH = BASE_DIR / "data" / "state_lgbt_laws.csv"
+OUT_PATH.parent.mkdir(exist_ok=True)
+
+FIELDNAMES = ["State", "Year", "Law_Name", "Category", "Direction",
+              "Scope", "Description", "Confidence", "Source"]
+
+LAWS = [
+
+    # =========================================================================
+    # FEDERAL / SCOTUS
+    # =========================================================================
+    ("USA", 1993, "Don't Ask Don't Tell (10 U.S.C. § 654)",
+     "ANTI_DISCRIMINATION", "RESTRICTION", "SEXUAL_ORIENTATION",
+     "Prohibited openly gay, lesbian, or bisexual persons from military service",
+     "HIGH", "Public Law 103-160"),
+
+    ("USA", 1996, "Defense of Marriage Act (DOMA)",
+     "MARRIAGE_PARTNERSHIP", "RESTRICTION", "SEXUAL_ORIENTATION",
+     "Federally defined marriage as opposite-sex; barred federal recognition of same-sex marriages",
+     "HIGH", "Public Law 104-199"),
+
+    ("USA", 2003, "Lawrence v. Texas (539 U.S. 558)",
+     "DECRIMINALIZATION", "PROTECTION", "SEXUAL_ORIENTATION",
+     "SCOTUS struck down all remaining state sodomy laws; established constitutional right to privacy",
+     "HIGH", "SCOTUS 2003"),
+
+    ("USA", 2009, "Matthew Shepard and James Byrd Jr. Hate Crimes Prevention Act",
+     "HATE_CRIME_LAW", "PROTECTION", "BOTH",
+     "Extended federal hate crime jurisdiction to crimes motivated by sexual orientation and gender identity",
+     "HIGH", "Public Law 111-84, Division E"),
+
+    ("USA", 2010, "Don't Ask Don't Tell Repeal Act",
+     "ANTI_DISCRIMINATION", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Repealed the 1993 DADT policy; allowed open service by gay, lesbian, and bisexual personnel",
+     "HIGH", "Public Law 111-321"),
+
+    ("USA", 2013, "United States v. Windsor (570 U.S. 744)",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "SCOTUS struck down Section 3 of DOMA; federal government required to recognise same-sex marriages",
+     "HIGH", "SCOTUS 2013"),
+
+    ("USA", 2015, "Obergefell v. Hodges (576 U.S. 644)",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "SCOTUS ruled same-sex marriage a constitutional right under 14th Amendment; binding on all 50 states",
+     "HIGH", "SCOTUS 2015"),
+
+    ("USA", 2020, "Bostock v. Clayton County (590 U.S. 644)",
+     "ANTI_DISCRIMINATION", "PROTECTION", "BOTH",
+     "SCOTUS ruled Title VII prohibits employment discrimination based on sexual orientation and gender identity",
+     "HIGH", "SCOTUS 2020"),
+
+    ("USA", 2022, "Respect for Marriage Act",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "BOTH",
+     "Federal law requiring recognition of same-sex and interracial marriages; repealed DOMA",
+     "HIGH", "Public Law 117-228"),
+
+    ("USA", 2025, "Executive Order on Military Service",
+     "TRANS_SPECIFIC", "RESTRICTION", "GENDER_IDENTITY",
+     "Presidential executive order reinstated restrictions on transgender personnel in active military service",
+     "HIGH", "Executive Order, January 2025"),
+
+    # =========================================================================
+    # HATE CRIME LAWS
+    # =========================================================================
+
+    ("Oregon", 1981, "ORS 166.155 / 166.165 (Malicious Harassment)",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "First state in the US to explicitly include sexual orientation in a hate crime statute",
+     "HIGH", "Oregon Revised Statutes 166.155"),
+
+    ("California", 1984, "Penal Code § 422.6 / § 422.55",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "California added sexual orientation to existing hate crime framework",
+     "HIGH", "California Penal Code § 422.6"),
+
+    ("Washington", 1988, "RCW 9A.36.080",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Malicious harassment statute includes sexual orientation",
+     "MEDIUM", "Revised Code of Washington 9A.36.080"),
+
+    ("Wisconsin", 1988, "Wis. Stat. § 939.645",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Penalty enhancer for crimes motivated by sexual orientation; upheld in Wisconsin v. Mitchell (1993)",
+     "HIGH", "Wisconsin Statutes § 939.645"),
+
+    ("District of Columbia", 1989, "D.C. Code § 22-3701 (Bias-Related Crime Act)",
+     "HATE_CRIME_LAW", "PROTECTION", "BOTH",
+     "DC Bias-Related Crime Act includes both sexual orientation and gender identity from its original enactment",
+     "HIGH", "D.C. Code § 22-3701"),
+
+    ("Minnesota", 1989, "Minn. Stat. § 626.5531",
+     "HATE_CRIME_LAW", "PROTECTION", "BOTH",
+     "Minnesota hate crime statute — one of the first to include both sexual orientation and gender identity",
+     "MEDIUM", "Minnesota Statutes § 626.5531"),
+
+    ("Connecticut", 1990, "CGS § 53a-181j / PA 90-149",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Added sexual orientation to bias crime statute",
+     "HIGH", "Connecticut General Statutes § 53a-181j"),
+
+    ("Massachusetts", 1990, "M.G.L. c. 265 § 39",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Massachusetts hate crime law includes sexual orientation",
+     "HIGH", "Massachusetts General Laws c. 265 § 39"),
+
+    ("New Hampshire", 1990, "RSA 651:6",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Penalty enhancement statute includes sexual orientation",
+     "HIGH", "New Hampshire RSA 651:6"),
+
+    ("New Jersey", 1990, "N.J.S.A. 2C:16-1",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "New Jersey Bias Intimidation statute includes sexual orientation",
+     "HIGH", "N.J.S.A. 2C:16-1"),
+
+    ("Vermont", 1990, "13 V.S.A. § 1455",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Vermont hate crime statute includes sexual orientation",
+     "HIGH", "13 Vermont Statutes Annotated § 1455"),
+
+    ("Florida", 1991, "F.S. § 877.19 (Hate Crimes Act)",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Florida Hate Crimes Act includes sexual orientation",
+     "HIGH", "Florida Statutes § 877.19"),
+
+    ("Iowa", 1992, "Iowa Code § 729A",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Ethnic and sexual orientation violations statute",
+     "MEDIUM", "Iowa Code § 729A"),
+
+    ("Hawaii", 1993, "HRS § 706-662",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Hawaii extended hate crime penalties to include sexual orientation",
+     "MEDIUM", "Hawaii Revised Statutes § 706-662"),
+
+    ("Maine", 1995, "17-A M.R.S. § 1151",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Maine hate crime statute updated to include sexual orientation",
+     "MEDIUM", "Maine Revised Statutes 17-A § 1151"),
+
+    ("Arizona", 1997, "ARS § 13-701.02",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Arizona bias crime statute penalty enhancement; includes sexual orientation",
+     "MEDIUM", "Arizona Revised Statutes § 13-701.02"),
+
+    ("Louisiana", 1997, "La. R.S. 14:107.2",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Louisiana Hate Crimes Act includes sexual orientation",
+     "HIGH", "Louisiana Revised Statutes 14:107.2"),
+
+    ("Rhode Island", 1998, "R.I.G.L. § 12-19-38",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Rhode Island hate crime reporting and penalty law includes sexual orientation",
+     "MEDIUM", "Rhode Island General Laws § 12-19-38"),
+
+    ("Nevada", 1999, "NRS 193.1675",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Nevada added sexual orientation to hate crime penalty enhancement statute",
+     "HIGH", "Nevada Revised Statutes 193.1675"),
+
+    ("New York", 2000, "NY Penal Law § 485.05 (Hate Crimes Act of 2000)",
+     "HATE_CRIME_LAW", "PROTECTION", "BOTH",
+     "New York Hate Crimes Act includes sexual orientation and gender identity/expression",
+     "HIGH", "New York Penal Law § 485.05"),
+
+    ("Kentucky", 2001, "KRS 532.031",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Kentucky hate crime penalty enhancement statute includes sexual orientation",
+     "HIGH", "Kentucky Revised Statutes 532.031"),
+
+    ("Texas", 2001, "Tex. Penal Code § 12.47 (James Byrd Jr. Hate Crimes Act)",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "James Byrd Jr. Hate Crimes Act includes sexual orientation",
+     "HIGH", "Texas Penal Code § 12.47"),
+
+    ("Nebraska", 2002, "Neb. Rev. Stat. § 28-111",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Nebraska hate crime law extended to include sexual orientation",
+     "MEDIUM", "Nebraska Revised Statutes § 28-111"),
+
+    ("Pennsylvania", 2002, "18 Pa.C.S. § 2710",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Pennsylvania Ethnic Intimidation law updated; sexual orientation added",
+     "MEDIUM", "18 Pennsylvania Consolidated Statutes § 2710"),
+
+    ("California", 2003, "AB 196 / Penal Code § 422.55 amendment",
+     "HATE_CRIME_LAW", "PROTECTION", "GENDER_IDENTITY",
+     "California added gender identity and expression to hate crime statute",
+     "HIGH", "California Penal Code § 422.55, AB 196 (2003)"),
+
+    ("New Mexico", 2003, "NMSA 1978 § 31-18B-1",
+     "HATE_CRIME_LAW", "PROTECTION", "BOTH",
+     "New Mexico hate crimes penalty act amended to include sexual orientation and gender identity",
+     "MEDIUM", "New Mexico Statutes Annotated 1978 § 31-18B-1"),
+
+    ("Colorado", 2005, "CRS 18-9-121",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Colorado updated hate crime statute to explicitly include sexual orientation",
+     "MEDIUM", "Colorado Revised Statutes 18-9-121"),
+
+    ("Maryland", 2005, "Md. Code Crim. Law § 10-304",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Maryland hate crime law updated to include sexual orientation",
+     "MEDIUM", "Maryland Code Criminal Law § 10-304"),
+
+    ("New Jersey", 2007, "N.J.S.A. 2C:16-1 amendment",
+     "HATE_CRIME_LAW", "PROTECTION", "GENDER_IDENTITY",
+     "New Jersey updated bias intimidation statute to explicitly include gender identity and expression",
+     "HIGH", "N.J.S.A. 2C:16-1 (2007 amendment)"),
+
+    ("Alaska", 2009, "AS 12.55.155(c) amendment",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Alaska bias crime sentencing aggravator updated to include sexual orientation",
+     "MEDIUM", "Alaska Statutes 12.55.155(c)"),
+
+    ("Delaware", 2009, "11 Del. C. § 1304",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Delaware updated hate crime law to include sexual orientation",
+     "MEDIUM", "11 Delaware Code § 1304"),
+
+    ("Illinois", 2010, "720 ILCS 5/12-7.1",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Illinois updated hate crime statute to explicitly include sexual orientation",
+     "MEDIUM", "720 Illinois Compiled Statutes 5/12-7.1"),
+
+    ("Illinois", 2011, "720 ILCS 5/12-7.1 (SB 3126)",
+     "HATE_CRIME_LAW", "PROTECTION", "GENDER_IDENTITY",
+     "Illinois added gender identity to hate crime statute",
+     "HIGH", "SB 3126 (2011)"),
+
+    ("North Carolina", 2012, "N.C.G.S. § 14-3(c) amendment",
+     "HATE_CRIME_LAW", "PROTECTION", "SEXUAL_ORIENTATION",
+     "North Carolina updated hate crime penalty enhancement to include sexual orientation",
+     "MEDIUM", "N.C.G.S. § 14-3(c)"),
+
+    ("Maryland", 2014, "Md. Code Crim. Law § 10-304 amendment",
+     "HATE_CRIME_LAW", "PROTECTION", "GENDER_IDENTITY",
+     "Maryland added gender identity to hate crime statute",
+     "MEDIUM", "Maryland Code Criminal Law § 10-304 (2014)"),
+
+    ("New Hampshire", 2018, "RSA 651:6 (HB 1319)",
+     "HATE_CRIME_LAW", "PROTECTION", "GENDER_IDENTITY",
+     "New Hampshire added gender identity to hate crime penalty enhancement",
+     "HIGH", "HB 1319 (2018)"),
+
+    ("Georgia", 2020, "O.C.G.A. § 17-10-17 (SB 426)",
+     "HATE_CRIME_LAW", "PROTECTION", "BOTH",
+     "Georgia passed first comprehensive hate crime law following Ahmaud Arbery killing; includes sexual orientation and gender identity",
+     "HIGH", "Georgia SB 426, signed June 2020"),
+
+    ("Virginia", 2020, "Va. Code § 18.2-57.2 / HB 1818",
+     "HATE_CRIME_LAW", "PROTECTION", "BOTH",
+     "Virginia strengthened hate crime statute to include sexual orientation and gender identity",
+     "HIGH", "HB 1818 (2020)"),
+
+    # --- States with NO hate crime law covering SO/GI ---
+    ("Alabama", 2024, "No hate crime law (SO/GI)",
+     "HATE_CRIME_LAW", "RESTRICTION", "BOTH",
+     "Alabama has no state hate crime statute covering sexual orientation or gender identity as of 2024",
+     "HIGH", "MAP Equality Maps 2024"),
+
+    ("Arkansas", 2024, "No hate crime law",
+     "HATE_CRIME_LAW", "RESTRICTION", "BOTH",
+     "Arkansas has no state hate crime statute as of 2024",
+     "HIGH", "MAP Equality Maps 2024"),
+
+    ("Idaho", 2024, "No hate crime law (SO/GI)",
+     "HATE_CRIME_LAW", "RESTRICTION", "BOTH",
+     "Idaho has no state hate crime statute covering SO or GI as of 2024",
+     "HIGH", "MAP Equality Maps 2024"),
+
+    ("Indiana", 2024, "No hate crime law (SO/GI)",
+     "HATE_CRIME_LAW", "RESTRICTION", "BOTH",
+     "Indiana has no state hate crime statute covering SO or GI as of 2024",
+     "HIGH", "MAP Equality Maps 2024"),
+
+    ("Kansas", 2024, "No hate crime law (SO/GI)",
+     "HATE_CRIME_LAW", "RESTRICTION", "BOTH",
+     "Kansas has no state hate crime statute covering SO or GI as of 2024",
+     "HIGH", "MAP Equality Maps 2024"),
+
+    ("Michigan", 2024, "Michigan Ethnic Intimidation Act — no SO/GI coverage",
+     "HATE_CRIME_LAW", "RESTRICTION", "BOTH",
+     "Michigan Ethnic Intimidation Act (MCL 750.147b) covers race, religion, color, national origin, sex, and age; sexual orientation and gender identity are not included",
+     "HIGH", "MCL 750.147b — MAP Equality Maps 2024"),
+
+    ("Mississippi", 2024, "No hate crime law (SO/GI)",
+     "HATE_CRIME_LAW", "RESTRICTION", "BOTH",
+     "Mississippi has no state hate crime statute covering SO or GI as of 2024",
+     "HIGH", "MAP Equality Maps 2024"),
+
+    ("Missouri", 2024, "Missouri malicious harassment statute — no explicit SO/GI",
+     "HATE_CRIME_LAW", "RESTRICTION", "BOTH",
+     "Missouri § 557.035 malicious harassment statute does not explicitly enumerate sexual orientation or gender identity",
+     "HIGH", "Missouri Revised Statutes § 557.035 — MAP Equality Maps 2024"),
+
+    ("Montana", 2024, "No hate crime law (SO/GI)",
+     "HATE_CRIME_LAW", "RESTRICTION", "BOTH",
+     "Montana has no state hate crime statute covering SO or GI as of 2024",
+     "HIGH", "MAP Equality Maps 2024"),
+
+    ("North Dakota", 2024, "No hate crime law (SO/GI)",
+     "HATE_CRIME_LAW", "RESTRICTION", "BOTH",
+     "North Dakota has no state hate crime statute covering SO or GI as of 2024",
+     "HIGH", "MAP Equality Maps 2024"),
+
+    ("Ohio", 2024, "Ohio RC 2927.12 — no SO/GI coverage",
+     "HATE_CRIME_LAW", "RESTRICTION", "BOTH",
+     "Ohio ethnic intimidation statute (RC 2927.12) covers race, color, religion, and national origin; sexual orientation and gender identity not included",
+     "HIGH", "Ohio Revised Code 2927.12 — MAP Equality Maps 2024"),
+
+    ("Oklahoma", 2024, "No hate crime law (SO/GI)",
+     "HATE_CRIME_LAW", "RESTRICTION", "BOTH",
+     "Oklahoma has no state hate crime statute covering SO or GI as of 2024",
+     "HIGH", "MAP Equality Maps 2024"),
+
+    ("South Carolina", 2024, "No hate crime law",
+     "HATE_CRIME_LAW", "RESTRICTION", "BOTH",
+     "South Carolina has no state hate crime statute as of 2024",
+     "HIGH", "MAP Equality Maps 2024"),
+
+    ("South Dakota", 2024, "No hate crime law (SO/GI)",
+     "HATE_CRIME_LAW", "RESTRICTION", "BOTH",
+     "South Dakota has no state hate crime statute covering SO or GI as of 2024",
+     "HIGH", "MAP Equality Maps 2024"),
+
+    ("Tennessee", 2024, "No hate crime law (SO/GI)",
+     "HATE_CRIME_LAW", "RESTRICTION", "BOTH",
+     "Tennessee has no state hate crime statute covering SO or GI as of 2024",
+     "HIGH", "MAP Equality Maps 2024"),
+
+    ("Utah", 2024, "Utah Criminal Code § 76-3-203.14 — uncertain SO/GI scope",
+     "HATE_CRIME_LAW", "RESTRICTION", "BOTH",
+     "Utah's 2019 hate crime enhancement law (SB 103) does not explicitly list sexual orientation or gender identity among protected categories — verify against MAP",
+     "MEDIUM", "Utah Code § 76-3-203.14 / SB 103 (2019) — verify MAP"),
+
+    ("West Virginia", 2024, "No hate crime law (SO/GI)",
+     "HATE_CRIME_LAW", "RESTRICTION", "BOTH",
+     "West Virginia has no state hate crime statute covering SO or GI as of 2024",
+     "HIGH", "MAP Equality Maps 2024"),
+
+    ("Wyoming", 2024, "No hate crime law",
+     "HATE_CRIME_LAW", "RESTRICTION", "BOTH",
+     "Wyoming has no state hate crime statute as of 2024",
+     "HIGH", "MAP Equality Maps 2024"),
+
+    # =========================================================================
+    # ANTI-DISCRIMINATION
+    # =========================================================================
+
+    ("Wisconsin", 1982, "Wisconsin Fair Employment Act (SO amendment)",
+     "ANTI_DISCRIMINATION", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Wisconsin became first state to prohibit employment discrimination based on sexual orientation",
+     "HIGH", "Wisconsin Fair Employment Act, 1982"),
+
+    ("Massachusetts", 1989, "M.G.L. c. 151B amendment",
+     "ANTI_DISCRIMINATION", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Massachusetts added sexual orientation to employment and housing anti-discrimination law",
+     "HIGH", "Massachusetts General Laws c. 151B"),
+
+    ("Connecticut", 1991, "CGS § 46a-81a (PA 91-58)",
+     "ANTI_DISCRIMINATION", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Connecticut added sexual orientation to state anti-discrimination law",
+     "HIGH", "Connecticut General Statutes § 46a-81a"),
+
+    ("Hawaii", 1991, "HRS § 378-2",
+     "ANTI_DISCRIMINATION", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Hawaii prohibited employment discrimination based on sexual orientation",
+     "HIGH", "Hawaii Revised Statutes § 378-2"),
+
+    ("California", 1992, "FEHA amendment",
+     "ANTI_DISCRIMINATION", "PROTECTION", "SEXUAL_ORIENTATION",
+     "California extended Fair Employment and Housing Act to include sexual orientation",
+     "MEDIUM", "California Government Code § 12940"),
+
+    ("New Jersey", 1992, "N.J.S.A. 10:5-12 (Law Against Discrimination)",
+     "ANTI_DISCRIMINATION", "PROTECTION", "SEXUAL_ORIENTATION",
+     "New Jersey Law Against Discrimination amended to include sexual orientation",
+     "HIGH", "N.J.S.A. 10:5-12"),
+
+    ("Vermont", 1992, "21 V.S.A. § 495 amendment",
+     "ANTI_DISCRIMINATION", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Vermont added sexual orientation to employment anti-discrimination protections",
+     "HIGH", "Vermont Fair Employment Practices Act"),
+
+    ("Minnesota", 1993, "Minn. Stat. § 363A (Human Rights Act)",
+     "ANTI_DISCRIMINATION", "PROTECTION", "BOTH",
+     "Minnesota Human Rights Act amended to include both sexual orientation and gender identity — one of the first states to include GI",
+     "HIGH", "Minnesota Human Rights Act § 363A"),
+
+    ("Rhode Island", 1995, "R.I.G.L. § 28-5-7",
+     "ANTI_DISCRIMINATION", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Rhode Island Fair Employment Practices Act extended to cover sexual orientation",
+     "HIGH", "Rhode Island General Laws § 28-5-7"),
+
+    ("New Hampshire", 1997, "RSA 354-A:7",
+     "ANTI_DISCRIMINATION", "PROTECTION", "SEXUAL_ORIENTATION",
+     "New Hampshire Law Against Discrimination amended to include sexual orientation",
+     "HIGH", "New Hampshire RSA 354-A:7"),
+
+    ("Nevada", 1999, "NRS 613.310",
+     "ANTI_DISCRIMINATION", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Nevada prohibited employment discrimination based on sexual orientation",
+     "MEDIUM", "Nevada Revised Statutes 613.310"),
+
+    ("Maryland", 2001, "Md. Code State Gov't § 20-606",
+     "ANTI_DISCRIMINATION", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Maryland added sexual orientation to state anti-discrimination law",
+     "HIGH", "Maryland Code State Government § 20-606"),
+
+    ("New York", 2002, "New York Human Rights Law amendment",
+     "ANTI_DISCRIMINATION", "PROTECTION", "SEXUAL_ORIENTATION",
+     "New York Human Rights Law extended to cover sexual orientation",
+     "HIGH", "New York Executive Law § 296"),
+
+    ("New Mexico", 2003, "NMSA 1978 § 28-1-7",
+     "ANTI_DISCRIMINATION", "PROTECTION", "BOTH",
+     "New Mexico Human Rights Act amended to include sexual orientation and gender identity",
+     "HIGH", "New Mexico Statutes Annotated 1978 § 28-1-7"),
+
+    ("California", 2003, "AB 196 / Government Code § 12926",
+     "ANTI_DISCRIMINATION", "PROTECTION", "GENDER_IDENTITY",
+     "California added gender identity and expression to FEHA anti-discrimination protections",
+     "HIGH", "California Government Code § 12926, AB 196"),
+
+    ("Illinois", 2005, "775 ILCS 5/1-102 (HB 1826)",
+     "ANTI_DISCRIMINATION", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Illinois Human Rights Act amended to include sexual orientation",
+     "HIGH", "HB 1826 (2005)"),
+
+    ("Maine", 2005, "5 M.R.S. § 4591 (LD 1196)",
+     "ANTI_DISCRIMINATION", "PROTECTION", "BOTH",
+     "Maine reinstated protections for sexual orientation and added gender identity after 2000 voter repeal",
+     "HIGH", "Maine Human Rights Act, LD 1196 (2005)"),
+
+    ("Illinois", 2006, "775 ILCS 5/1-102 (HB 4066)",
+     "ANTI_DISCRIMINATION", "PROTECTION", "GENDER_IDENTITY",
+     "Illinois Human Rights Act amended to add gender identity",
+     "HIGH", "HB 4066 (2006)"),
+
+    ("Colorado", 2007, "CRS 24-34-402",
+     "ANTI_DISCRIMINATION", "PROTECTION", "BOTH",
+     "Colorado added sexual orientation and gender identity to employment and housing anti-discrimination laws",
+     "HIGH", "Colorado Revised Statutes 24-34-402"),
+
+    ("Iowa", 2007, "Iowa Code § 216.6",
+     "ANTI_DISCRIMINATION", "PROTECTION", "BOTH",
+     "Iowa Civil Rights Act amended to include sexual orientation and gender identity",
+     "HIGH", "Iowa Code § 216.6"),
+
+    ("Oregon", 2007, "ORS 659A.006 (Equality Act)",
+     "ANTI_DISCRIMINATION", "PROTECTION", "BOTH",
+     "Oregon Equality Act added sexual orientation and gender identity to anti-discrimination protections",
+     "HIGH", "Oregon Revised Statutes 659A.006"),
+
+    ("Washington", 2006, "RCW 49.60.180 (HB 2661)",
+     "ANTI_DISCRIMINATION", "PROTECTION", "BOTH",
+     "Washington added sexual orientation and gender identity to Law Against Discrimination",
+     "HIGH", "HB 2661 (2006)"),
+
+    ("Delaware", 2009, "19 Del. C. § 711",
+     "ANTI_DISCRIMINATION", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Delaware added sexual orientation to employment anti-discrimination law",
+     "HIGH", "Delaware Code 19 § 711"),
+
+    ("Nevada", 2011, "NRS 613.310 (SB 331)",
+     "ANTI_DISCRIMINATION", "PROTECTION", "GENDER_IDENTITY",
+     "Nevada added gender identity and expression to anti-discrimination protections",
+     "HIGH", "SB 331 (2011)"),
+
+    ("Delaware", 2013, "19 Del. C. § 711 amendment",
+     "ANTI_DISCRIMINATION", "PROTECTION", "GENDER_IDENTITY",
+     "Delaware added gender identity to employment anti-discrimination law",
+     "MEDIUM", "Delaware Code 19 § 711 (2013 amendment)"),
+
+    ("Maryland", 2014, "Md. Code State Gov't § 20-606 (HB 235)",
+     "ANTI_DISCRIMINATION", "PROTECTION", "GENDER_IDENTITY",
+     "Maryland added gender identity to state anti-discrimination law",
+     "HIGH", "HB 235 (2014)"),
+
+    ("Utah", 2015, "SB 296 / Utah Antidiscrimination Act",
+     "ANTI_DISCRIMINATION", "PROTECTION", "BOTH",
+     "Utah added sexual orientation and gender identity to employment and housing anti-discrimination law",
+     "HIGH", "SB 296 (2015)"),
+
+    ("New York", 2019, "Gender Expression Non-Discrimination Act (GENDA)",
+     "ANTI_DISCRIMINATION", "PROTECTION", "GENDER_IDENTITY",
+     "New York added gender identity and expression to Human Rights Law protections",
+     "HIGH", "GENDA, signed January 2019"),
+
+    ("Virginia", 2020, "Virginia Values Act (HB 1429)",
+     "ANTI_DISCRIMINATION", "PROTECTION", "BOTH",
+     "Virginia added sexual orientation and gender identity to state anti-discrimination law",
+     "HIGH", "HB 1429, signed April 2020"),
+
+    # =========================================================================
+    # MARRIAGE / PARTNERSHIP
+    # =========================================================================
+
+    ("Hawaii", 1993, "Baehr v. Lewin (74 Haw. 530)",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Hawaii Supreme Court ruled denial of same-sex marriage licenses potentially unconstitutional; first major SSM ruling in the US",
+     "HIGH", "Hawaii Supreme Court 1993"),
+
+    ("Hawaii", 1998, "Hawaii Constitutional Amendment",
+     "MARRIAGE_PARTNERSHIP", "RESTRICTION", "SEXUAL_ORIENTATION",
+     "Hawaii voters approved constitutional amendment allowing legislature to reserve marriage for opposite-sex couples",
+     "HIGH", "Hawaii Constitutional Amendment, 1998"),
+
+    ("Alaska", 1998, "Alaska Constitutional Amendment",
+     "MARRIAGE_PARTNERSHIP", "RESTRICTION", "SEXUAL_ORIENTATION",
+     "Alaska voters approved constitutional amendment limiting marriage to opposite-sex couples",
+     "HIGH", "Alaska Constitutional Amendment, 1998"),
+
+    ("Vermont", 2000, "Baker v. State / Civil Union Act",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Vermont became first state to legalise civil unions for same-sex couples following Baker v. State ruling",
+     "HIGH", "Vermont Civil Union Act, 2000"),
+
+    ("Massachusetts", 2004, "Goodridge v. Department of Public Health",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Massachusetts became first US state to legalise same-sex marriage; effective May 2004",
+     "HIGH", "Massachusetts SJC, November 2003 / effective May 2004"),
+
+    ("Connecticut", 2008, "Kerrigan v. Commissioner of Public Health",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Connecticut Supreme Court legalised same-sex marriage",
+     "HIGH", "Kerrigan v. Commissioner (2008)"),
+
+    ("California", 2008, "In re Marriage Cases / Prop 8",
+     "MARRIAGE_PARTNERSHIP", "RESTRICTION", "SEXUAL_ORIENTATION",
+     "California Supreme Court legalised SSM (June 2008); Proposition 8 then banned it by voter referendum (November 2008)",
+     "HIGH", "In re Marriage Cases 43 Cal.4th 757; Prop 8 November 2008"),
+
+    ("Iowa", 2009, "Varnum v. Brien",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Iowa Supreme Court unanimously legalised same-sex marriage",
+     "HIGH", "Varnum v. Brien 763 N.W.2d 862"),
+
+    ("Vermont", 2009, "HB 211",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Vermont became first state to legalise SSM through legislative action (not court ruling)",
+     "HIGH", "Vermont HB 211, signed April 2009"),
+
+    ("Maine", 2009, "LD 1020 / People's Veto",
+     "MARRIAGE_PARTNERSHIP", "RESTRICTION", "SEXUAL_ORIENTATION",
+     "Maine legislature passed SSM; voters repealed it via People's Veto in November 2009",
+     "HIGH", "Maine LD 1020 / People's Veto referendum 2009"),
+
+    ("New Hampshire", 2010, "HB 436",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "New Hampshire legalised same-sex marriage through legislation",
+     "HIGH", "New Hampshire HB 436, effective January 2010"),
+
+    ("District of Columbia", 2010, "Religious Freedom and Civil Marriage Equality Amendment Act",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "DC legalised same-sex marriage; effective March 2010",
+     "HIGH", "DC Act 18-248"),
+
+    ("New York", 2011, "Marriage Equality Act",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "New York legalised same-sex marriage through legislature",
+     "HIGH", "New York Marriage Equality Act, signed June 2011"),
+
+    ("Maine", 2012, "People's Referendum",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Maine voters approved same-sex marriage — reversing 2009 People's Veto",
+     "HIGH", "Maine Question 1, November 2012"),
+
+    ("Maryland", 2012, "Civil Marriage Protection Act",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Maryland legalised same-sex marriage; approved by voters November 2012",
+     "HIGH", "Maryland HB 438 / voter referendum November 2012"),
+
+    ("Washington", 2012, "Referendum 74",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Washington voters approved same-sex marriage; effective December 2012",
+     "HIGH", "Washington Referendum 74, November 2012"),
+
+    ("California", 2013, "Hollingsworth v. Perry",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "SCOTUS dismissed Prop 8 appeal; reinstated same-sex marriage in California",
+     "HIGH", "Hollingsworth v. Perry 570 U.S. 693 (2013)"),
+
+    ("Delaware", 2013, "SB 1",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Delaware legalised same-sex marriage through legislation",
+     "HIGH", "Delaware SB 1, signed May 2013"),
+
+    ("Minnesota", 2013, "HF 1054",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Minnesota legalised same-sex marriage through legislature",
+     "HIGH", "Minnesota HF 1054, signed May 2013"),
+
+    ("Rhode Island", 2013, "SB 38",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Rhode Island legalised same-sex marriage through legislation",
+     "HIGH", "Rhode Island SB 38, signed May 2013"),
+
+    ("Hawaii", 2013, "SB 1",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Hawaii legalised same-sex marriage through legislature",
+     "HIGH", "Hawaii SB 1, signed November 2013"),
+
+    ("Illinois", 2013, "Religious Freedom and Marriage Fairness Act",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Illinois legalised same-sex marriage; effective June 2014",
+     "HIGH", "Illinois SB 10 / Public Act 098-0597"),
+
+    ("New Mexico", 2013, "Griego v. Oliver",
+     "MARRIAGE_PARTNERSHIP", "PROTECTION", "SEXUAL_ORIENTATION",
+     "New Mexico Supreme Court unanimously legalised same-sex marriage",
+     "HIGH", "Griego v. Oliver 2013 NMSC-045"),
+
+    # =========================================================================
+    # TRANS-SPECIFIC
+    # =========================================================================
+
+    ("Minnesota", 1993, "Minnesota Human Rights Act — gender identity",
+     "TRANS_SPECIFIC", "PROTECTION", "GENDER_IDENTITY",
+     "Minnesota was the first state to explicitly include gender identity in civil rights protections",
+     "HIGH", "Minnesota Human Rights Act § 363A (1993)"),
+
+    ("California", 2003, "Gender Non-Discrimination Act (AB 196)",
+     "TRANS_SPECIFIC", "PROTECTION", "GENDER_IDENTITY",
+     "California added gender identity and expression to employment anti-discrimination protections",
+     "HIGH", "AB 196, signed September 2003"),
+
+    ("North Carolina", 2016, "HB 2 (Public Facilities Privacy & Security Act)",
+     "TRANS_SPECIFIC", "RESTRICTION", "GENDER_IDENTITY",
+     "Required transgender individuals to use bathrooms matching birth certificate sex; voided local non-discrimination ordinances",
+     "HIGH", "North Carolina HB 2, signed March 2016"),
+
+    ("North Carolina", 2017, "HB 142",
+     "TRANS_SPECIFIC", "RESTRICTION", "GENDER_IDENTITY",
+     "Partially repealed HB 2 but retained restrictions on local non-discrimination ordinances until 2020",
+     "HIGH", "North Carolina HB 142, signed March 2017"),
+
+    ("Idaho", 2020, "HB 500 (Fairness in Women's Sports Act)",
+     "TRANS_SPECIFIC", "RESTRICTION", "GENDER_IDENTITY",
+     "Idaho first state to ban transgender women and girls from competing in female athletic categories",
+     "HIGH", "Idaho HB 500, signed March 2020"),
+
+    ("Arkansas", 2021, "SAFE Act (SB 354)",
+     "TRANS_SPECIFIC", "RESTRICTION", "GENDER_IDENTITY",
+     "Arkansas first state to ban gender-affirming medical care for transgender minors",
+     "HIGH", "Arkansas SB 354, signed April 2021"),
+
+    ("Florida", 2022, "Parental Rights in Education Act (HB 1557)",
+     "TRANS_SPECIFIC", "RESTRICTION", "BOTH",
+     "Prohibited classroom instruction on SO and GI in K-3; extended to K-12 in 2023",
+     "HIGH", "Florida HB 1557, signed March 2022"),
+
+    ("Georgia", 2023, "SB 140",
+     "TRANS_SPECIFIC", "RESTRICTION", "GENDER_IDENTITY",
+     "Georgia banned gender-affirming care for minors",
+     "HIGH", "Georgia SB 140, signed March 2023"),
+
+    ("Indiana", 2023, "HEA 1569",
+     "TRANS_SPECIFIC", "RESTRICTION", "GENDER_IDENTITY",
+     "Indiana banned gender-affirming care for minors",
+     "HIGH", "Indiana HEA 1569, signed April 2023"),
+
+    ("Iowa", 2023, "SF 538",
+     "TRANS_SPECIFIC", "RESTRICTION", "GENDER_IDENTITY",
+     "Iowa banned gender-affirming care for minors",
+     "HIGH", "Iowa SF 538, signed March 2023"),
+
+    ("Mississippi", 2023, "SB 2220",
+     "TRANS_SPECIFIC", "RESTRICTION", "GENDER_IDENTITY",
+     "Mississippi banned gender-affirming care for minors",
+     "HIGH", "Mississippi SB 2220, signed February 2023"),
+
+    ("Montana", 2023, "SB 99",
+     "TRANS_SPECIFIC", "RESTRICTION", "GENDER_IDENTITY",
+     "Montana banned gender-affirming care for minors",
+     "HIGH", "Montana SB 99, signed April 2023"),
+
+    ("Tennessee", 2023, "SB 1",
+     "TRANS_SPECIFIC", "RESTRICTION", "GENDER_IDENTITY",
+     "Tennessee banned gender-affirming care for minors",
+     "HIGH", "Tennessee SB 1, signed March 2023"),
+
+    ("Texas", 2023, "SB 14",
+     "TRANS_SPECIFIC", "RESTRICTION", "GENDER_IDENTITY",
+     "Texas banned gender-affirming care (puberty blockers, hormone therapy) for minors",
+     "HIGH", "Texas SB 14, signed June 2023"),
+
+    ("California", 2023, "SB 107",
+     "TRANS_SPECIFIC", "PROTECTION", "GENDER_IDENTITY",
+     "California shielded families seeking gender-affirming care from prosecution by other states",
+     "HIGH", "California SB 107 / effective January 2023"),
+
+    ("Florida", 2023, "SB 254",
+     "TRANS_SPECIFIC", "RESTRICTION", "GENDER_IDENTITY",
+     "Florida banned gender-affirming care for minors and added restrictions for adults",
+     "HIGH", "Florida SB 254, signed May 2023"),
+
+    ("Minnesota", 2023, "SF 2571 / HF 2887",
+     "TRANS_SPECIFIC", "PROTECTION", "GENDER_IDENTITY",
+     "Minnesota established itself as a Trans Refuge state; protects access to gender-affirming care",
+     "HIGH", "Minnesota SF 2571, signed May 2023"),
+
+    # =========================================================================
+    # DECRIMINALIZATION / SODOMY LAWS
+    # =========================================================================
+
+    ("Illinois", 1961, "Illinois Criminal Code reform",
+     "DECRIMINALIZATION", "PROTECTION", "SEXUAL_ORIENTATION",
+     "Illinois first state to decriminalise consensual same-sex activity between adults",
+     "HIGH", "Illinois Criminal Code 1961"),
+
+    ("California", 1975, "Consenting Adults Act",
+     "DECRIMINALIZATION", "PROTECTION", "SEXUAL_ORIENTATION",
+     "California fully decriminalised consensual same-sex sexual activity between adults",
+     "HIGH", "California Penal Code amendment 1975"),
+
+    # States with active sodomy laws 1991-2003 (struck down by Lawrence v. Texas)
+    ("Alabama", 1991, "Alabama Code § 13A-6-65(a)(3) — active sodomy law",
+     "DECRIMINALIZATION", "RESTRICTION", "SEXUAL_ORIENTATION",
+     "Alabama sodomy law criminalised consensual same-sex activity; in effect 1991 until struck down by Lawrence v. Texas (2003)",
+     "HIGH", "Alabama Code § 13A-6-65 / Lawrence v. Texas 2003"),
+
+    ("Florida", 1991, "Florida Statute § 800.02 — active sodomy law",
+     "DECRIMINALIZATION", "RESTRICTION", "SEXUAL_ORIENTATION",
+     "Florida sodomy law ('unnatural and lascivious act') in effect 1991 until Lawrence v. Texas (2003)",
+     "HIGH", "Florida Statute § 800.02 / Lawrence v. Texas 2003"),
+
+    ("Idaho", 1991, "Idaho Code § 18-6605 — active sodomy law",
+     "DECRIMINALIZATION", "RESTRICTION", "SEXUAL_ORIENTATION",
+     "Idaho sodomy law in effect 1991 until Lawrence v. Texas (2003)",
+     "HIGH", "Idaho Code § 18-6605 / Lawrence v. Texas 2003"),
+
+    ("Kansas", 1991, "Kansas Statute § 21-3505 — active sodomy law",
+     "DECRIMINALIZATION", "RESTRICTION", "SEXUAL_ORIENTATION",
+     "Kansas same-sex only sodomy law in effect 1991 until Lawrence v. Texas (2003)",
+     "HIGH", "Kansas Statute § 21-3505 / Lawrence v. Texas 2003"),
+
+    ("Louisiana", 1991, "Louisiana RS 14:89 — Crime Against Nature",
+     "DECRIMINALIZATION", "RESTRICTION", "SEXUAL_ORIENTATION",
+     "Louisiana Crime Against Nature statute in effect 1991 until Lawrence v. Texas (2003)",
+     "HIGH", "Louisiana Revised Statutes 14:89 / Lawrence v. Texas 2003"),
+
+    ("Michigan", 1991, "Michigan Penal Code § 750.158 — active sodomy law",
+     "DECRIMINALIZATION", "RESTRICTION", "SEXUAL_ORIENTATION",
+     "Michigan sodomy law in effect 1991 until Lawrence v. Texas (2003)",
+     "HIGH", "Michigan Penal Code § 750.158 / Lawrence v. Texas 2003"),
+
+    ("Mississippi", 1991, "Mississippi Code § 97-29-59 — active sodomy law",
+     "DECRIMINALIZATION", "RESTRICTION", "SEXUAL_ORIENTATION",
+     "Mississippi sodomy law in effect 1991 until Lawrence v. Texas (2003)",
+     "HIGH", "Mississippi Code § 97-29-59 / Lawrence v. Texas 2003"),
+
+    ("North Carolina", 1991, "North Carolina GS § 14-177 — active sodomy law",
+     "DECRIMINALIZATION", "RESTRICTION", "SEXUAL_ORIENTATION",
+     "North Carolina crime against nature law in effect 1991 until Lawrence v. Texas (2003)",
+     "HIGH", "North Carolina General Statutes § 14-177 / Lawrence v. Texas 2003"),
+
+    ("Oklahoma", 1991, "Oklahoma Statute 21 § 886 — active sodomy law",
+     "DECRIMINALIZATION", "RESTRICTION", "SEXUAL_ORIENTATION",
+     "Oklahoma sodomy law in effect 1991 until Lawrence v. Texas (2003)",
+     "HIGH", "Oklahoma Statute 21 § 886 / Lawrence v. Texas 2003"),
+
+    ("South Carolina", 1991, "South Carolina Code § 16-15-120 — active sodomy law",
+     "DECRIMINALIZATION", "RESTRICTION", "SEXUAL_ORIENTATION",
+     "South Carolina buggery statute in effect 1991 until Lawrence v. Texas (2003)",
+     "HIGH", "South Carolina Code § 16-15-120 / Lawrence v. Texas 2003"),
+
+    ("Texas", 1991, "Texas Penal Code § 21.06 (Homosexual Conduct Law)",
+     "DECRIMINALIZATION", "RESTRICTION", "SEXUAL_ORIENTATION",
+     "Texas Homosexual Conduct law exclusively targeted same-sex behaviour; struck down in Lawrence v. Texas (2003)",
+     "HIGH", "Texas Penal Code § 21.06 / struck down Lawrence v. Texas 2003"),
+
+    ("Utah", 1991, "Utah Code § 76-5-403 — active sodomy law",
+     "DECRIMINALIZATION", "RESTRICTION", "SEXUAL_ORIENTATION",
+     "Utah sodomy law in effect 1991 until Lawrence v. Texas (2003)",
+     "HIGH", "Utah Code § 76-5-403 / Lawrence v. Texas 2003"),
+
+    ("Virginia", 1991, "Virginia Code § 18.2-361 — active sodomy law",
+     "DECRIMINALIZATION", "RESTRICTION", "SEXUAL_ORIENTATION",
+     "Virginia crimes against nature statute in effect 1991 until Lawrence v. Texas (2003)",
+     "HIGH", "Virginia Code § 18.2-361 / Lawrence v. Texas 2003"),
+
+    ("USA", 2003, "Lawrence v. Texas — national effect",
+     "DECRIMINALIZATION", "PROTECTION", "SEXUAL_ORIENTATION",
+     "SCOTUS struck down Texas sodomy law (and by implication all remaining state sodomy laws); directly affected AL, FL, ID, KS, LA, MI, MS, NC, OK, SC, TX, UT, VA",
+     "HIGH", "Lawrence v. Texas 539 U.S. 558 (2003)"),
+]
+
+rows = [dict(zip(FIELDNAMES, r)) for r in LAWS]
+rows.sort(key=lambda x: (x["Category"], x["State"], x["Year"]))
+
+with open(OUT_PATH, "w", newline="", encoding="utf-8") as f:
+    writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
+    writer.writeheader()
+    writer.writerows(rows)
+
+from collections import Counter
+cats  = Counter(r["Category"]   for r in rows)
+conf  = Counter(r["Confidence"] for r in rows)
+dirs  = Counter(r["Direction"]  for r in rows)
+
+print(f"✓ Saved {len(rows)} records → {OUT_PATH}")
+print(f"\nBy category:"); [print(f"  {k:<30} {v}") for k,v in sorted(cats.items())]
+print(f"\nBy direction:"); [print(f"  {k:<20} {v}") for k,v in sorted(dirs.items())]
+print(f"\nBy confidence:"); [print(f"  {k:<25} {v}") for k,v in sorted(conf.items())]
+nv = [r for r in rows if r["Confidence"] in ("MEDIUM","NEEDS_VERIFICATION")]
+print(f"\nMEDIUM/NEEDS_VERIFICATION entries ({len(nv)}) — verify against MAP before final analysis:")
+for r in nv:
+    print(f"  [{r['Confidence'][:4]}] {r['State']:<25} {r['Year']}  {r['Law_Name'][:55]}")

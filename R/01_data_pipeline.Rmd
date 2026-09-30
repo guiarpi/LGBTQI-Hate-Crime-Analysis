@@ -1,0 +1,479 @@
+---
+title: "LGBTQI+ Hate Crime Analysis — 01: Data Pipeline"
+author: "Guilherme Arpi"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+    highlight: tango
+    code_folding: show
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(
+  root.dir = if (basename(getwd()) == "R") ".." else "."
+)
+
+knitr::opts_chunk$set(
+  echo    = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.align = "center"
+)
+```
+
+## Overview
+
+This notebook ingests the raw FBI Uniform Crime Reporting (UCR) hate crime dataset, filters for LGBTQI+-motivated incidents, engineers features, and produces three analysis-ready CSV files used by all downstream scripts.
+
+**Inputs**
+
+| File | Description |
+|------|-------------|
+| `data/hate_crime.csv` | FBI UCR hate crime statistics, 1991–2024 (~265k rows) |
+| `data/gini_index_1991_2024.csv` | Year-specific Gini coefficient by state (built by `build_gini_dataset.py`) |
+| `data/total_population_1991_2024.csv` | Total state population, Census intercensal estimates (built by `build_population_datasets.py`) |
+| `data/lgbt_population_2012_2024.csv` | LGBT adult population % by state, 2012–2024 (built by `build_population_datasets.py`) |
+| `data/state_law_panel.csv` | Time-varying hate crime law coverage per state × year (built by `build_law_panel.py`) |
+
+**Outputs**
+
+| File | Description |
+|------|-------------|
+| `data/lgbtq_hate_crimes_full.csv` | All LGBTQI+ incidents, 1991–2024 (~45k rows) |
+| `data/lgbtq_hate_crimes_enriched.csv` | Incident-level data (2010–2024) joined with Gini, population, and law panel — ML-ready |
+| `data/state_year_aggregate.csv` | State × year summary with two-track normalised rates — Tableau-ready |
+
+---
+
+## Setup
+
+```{r libraries}
+library(tidyverse)
+library(lubridate)
+```
+
+```{r paths}
+BASE_DIR <- if (basename(getwd()) == "R") dirname(getwd()) else getwd()  # works from repo root or from R/
+RAW_FBI      <- file.path(BASE_DIR, "data", "hate_crime.csv")
+RAW_GINI     <- file.path(BASE_DIR, "data", "gini_index_1991_2024.csv")
+RAW_POP_TOT  <- file.path(BASE_DIR, "data", "total_population_1991_2024.csv")
+RAW_POP_LGBT <- file.path(BASE_DIR, "data", "lgbt_population_2012_2024.csv")
+RAW_LAW_PANEL <- file.path(BASE_DIR, "data", "state_law_panel.csv")
+DATA_DIR     <- file.path(BASE_DIR, "data")
+
+INCLUDE_2026_SRS <- FALSE
+SRS_FILE <- file.path(DATA_DIR, "2026_HC_NATIONAL_MASTER_FILE.txt")
+
+dir.create(DATA_DIR, showWarnings = FALSE, recursive = TRUE)
+```
+
+---
+
+## 1. Load & Filter FBI Data
+
+The raw FBI UCR file covers all reported hate crime incidents across all bias categories (race, religion, national origin, sexual orientation, gender identity, disability, etc.). We filter to LGBTQI+-motivated incidents using keyword matching on the `BIAS_DESC` field.
+
+The 2024 file ships with lowercase column names; `rename_with(str_to_upper)` normalises to uppercase for consistency across vintages.
+
+```{r load-fbi}
+fbi <- read_csv(RAW_FBI, show_col_types = FALSE) |>
+  rename_with(str_to_upper) |>
+  rename(any_of(c(
+    POPULATION_GROUP_DESC = "POPULATION_GROUP_DESCRIPTION"
+  )))
+
+cat(sprintf("Raw rows: %s\n", format(nrow(fbi), big.mark = ",")))
+
+# Filter to LGBTQI+ bias motivations
+lgbt_terms <- c("gay", "lesbian", "bisexual", "transgender",
+                "gender non-conform", "sexual orient", "gender identity")
+pattern    <- paste(lgbt_terms, collapse = "|")
+
+df <- fbi |>
+  filter(str_detect(str_to_lower(BIAS_DESC), pattern)) |>
+  mutate(across(everything(), as.character))
+
+cat(sprintf("LGBTQI+ rows: %s (%.1f%% of total)\n",
+            format(nrow(df), big.mark = ","),
+            100 * nrow(df) / nrow(fbi)))
+```
+
+---
+
+## 2. Clean & Type-Cast
+
+Date parsing uses `coalesce(ymd(), dmy())` to handle both the ISO format (`YYYY-MM-DD`) used in newer FBI files and the legacy `DD-MMM-YYYY` format used in older ones.
+
+```{r clean}
+df <- df |>
+  mutate(
+    INCIDENT_DATE          = coalesce(ymd(INCIDENT_DATE), dmy(INCIDENT_DATE)),
+    YEAR                   = as.integer(DATA_YEAR),
+    MONTH                  = month(INCIDENT_DATE),
+    MONTH_NAME             = month(INCIDENT_DATE, label = TRUE, abbr = TRUE) |> as.character(),
+    VICTIM_COUNT           = as.integer(VICTIM_COUNT),
+    TOTAL_OFFENDER_COUNT   = as.integer(TOTAL_OFFENDER_COUNT),
+    ADULT_VICTIM_COUNT     = as.integer(replace_na(ADULT_VICTIM_COUNT,    "0")),
+    JUVENILE_VICTIM_COUNT  = as.integer(replace_na(JUVENILE_VICTIM_COUNT, "0")),
+    JUVENILE_OFFENDER_COUNT = as.integer(replace_na(JUVENILE_OFFENDER_COUNT, "0")),
+    MULTIPLE_OFFENSE_FLAG  = as.integer(MULTIPLE_OFFENSE == "M"),
+    MULTIPLE_BIAS_FLAG     = as.integer(MULTIPLE_BIAS    == "M"),
+  )
+```
+
+---
+
+## 3. Feature Engineering
+
+Four helper functions derive simplified categorical features from raw text fields. These make downstream analysis and visualisation cleaner.
+
+```{r features}
+# Simplified bias category
+classify_bias <- function(bias) {
+  b <- str_to_lower(bias)
+  case_when(
+    str_detect(b, "gender non-conform")               ~ "Anti-Gender Non-Conforming",
+    str_detect(b, "transgender")                       ~ "Anti-Transgender",
+    str_detect(b, "bisexual")                          ~ "Anti-Bisexual",
+    str_detect(b, "lesbian") & !str_detect(b, "gay")  ~ "Anti-Lesbian",
+    str_detect(b, "lesbian") & str_detect(b, "gay")   ~ "Anti-LGBTQ (General)",
+    str_detect(b, "gay")                               ~ "Anti-Gay (Male)",
+    TRUE                                               ~ "Anti-LGBTQ (Other)"
+  )
+}
+
+# Offense severity (0 = non-violent, 1 = simple assault, 2 = serious violent)
+violent_terms <- c("Murder", "Rape", "Aggravated Assault", "Simple Assault",
+                   "Robbery", "Arson", "Human Trafficking")
+
+severity_tier <- function(offense) {
+  case_when(
+    str_detect(offense, "Murder|Rape")                    ~ 2L,
+    str_detect(offense, "Aggravated Assault|Robbery|Arson") ~ 2L,
+    str_detect(offense, "Simple Assault")                 ~ 1L,
+    TRUE                                                  ~ 0L
+  )
+}
+
+# Season
+season_from_month <- function(m) {
+  case_when(
+    m %in% c(12, 1, 2)   ~ "Winter",
+    m %in% c(3, 4, 5)    ~ "Spring",
+    m %in% c(6, 7, 8)    ~ "Summer",
+    m %in% c(9, 10, 11)  ~ "Fall",
+    TRUE                  ~ NA_character_
+  )
+}
+
+# Agency and location simplifications
+simplify_agency <- function(a) {
+  case_when(
+    str_detect(a, "City")       ~ "City Police",
+    str_detect(a, "County")     ~ "County Sheriff",
+    str_detect(a, "University") ~ "University/College PD",
+    str_detect(a, "State")      ~ "State Police",
+    TRUE                        ~ "Other"
+  )
+}
+
+simplify_location <- function(loc) {
+  case_when(
+    str_detect(loc, "Residence|Home")                     ~ "Residence/Home",
+    str_detect(loc, "Street|Highway|Road|Alley|Sidewalk") ~ "Street/Highway",
+    str_detect(loc, "School|College")                     ~ "School/Campus",
+    str_detect(loc, "Church|Synagogue|Mosque|Temple")     ~ "Religious Institution",
+    str_detect(loc, "Bar|Restaurant")                     ~ "Bar/Restaurant",
+    str_detect(loc, "Park")                               ~ "Park/Outdoor",
+    TRUE                                                  ~ "Other"
+  )
+}
+
+df <- df |>
+  mutate(
+    BIAS_CATEGORY      = classify_bias(BIAS_DESC),
+    IS_VIOLENT         = as.integer(str_detect(OFFENSE_NAME,
+                           paste(violent_terms, collapse = "|"))),
+    SEVERITY_TIER      = severity_tier(OFFENSE_NAME),
+    SEASON             = season_from_month(MONTH),
+    JUVENILE_INVOLVED  = as.integer(JUVENILE_VICTIM_COUNT > 0 |
+                                    JUVENILE_OFFENDER_COUNT > 0),
+    AGENCY_TYPE_SIMPLE = simplify_agency(AGENCY_TYPE_NAME),
+    LOCATION_SIMPLE    = simplify_location(LOCATION_NAME)
+  )
+```
+
+---
+
+## 4. Export Full Dataset (1991–2024)
+
+The full dataset retains all LGBTQI+ incidents across the entire 34-year window. It is the primary input for trend analysis and the EDA script.
+
+```{r export-full}
+full_cols <- c(
+  "INCIDENT_ID", "YEAR", "MONTH", "MONTH_NAME", "SEASON",
+  "STATE_NAME", "STATE_ABBR", "REGION_NAME", "DIVISION_NAME",
+  "BIAS_DESC", "BIAS_CATEGORY",
+  "OFFENSE_NAME", "IS_VIOLENT", "SEVERITY_TIER",
+  "VICTIM_COUNT", "TOTAL_OFFENDER_COUNT",
+  "ADULT_VICTIM_COUNT", "JUVENILE_VICTIM_COUNT",
+  "JUVENILE_INVOLVED",
+  "LOCATION_NAME", "LOCATION_SIMPLE",
+  "OFFENDER_RACE", "OFFENDER_ETHNICITY",
+  "AGENCY_TYPE_NAME", "AGENCY_TYPE_SIMPLE",
+  "POPULATION_GROUP_DESC",
+  "MULTIPLE_OFFENSE_FLAG", "MULTIPLE_BIAS_FLAG",
+  "VICTIM_TYPES"
+)
+
+full_out <- file.path(DATA_DIR, "lgbtq_hate_crimes_full.csv")
+df |> select(all_of(full_cols)) |> write_csv(full_out)
+
+cat(sprintf("Saved → lgbtq_hate_crimes_full.csv\n  %s rows | Years: %d–%d\n",
+            format(nrow(df), big.mark = ","),
+            min(df$YEAR), max(df$YEAR)))
+```
+
+---
+
+## 5. Load Reference Datasets
+
+Three reference datasets provide the denominators and covariates for normalisation and regression:
+
+- **Gini index** (state × year, 1991–2024): Frank-Sommeiller-Price historical series (1991–2005) bridged to ACS estimates (2006–2024), with linear interpolation for intercensal years.
+- **Total population** (state × year, 1991–2024): Census decennial anchors (2000, 2010, 2020) with linear interpolation.
+- **LGBT population** (state × year, 2012–2024 only): Williams Institute / Gallup / BRFSS state-level estimates. **Pre-2012 data does not exist** — backward interpolation was deliberately avoided.
+- **State law panel** (state × year, 1991–2024): Time-varying hate crime law coverage from the Movement Advancement Project. `LAW_LEVEL` = 0 (no coverage), 1 (sexual orientation only), 2 (SO + gender identity).
+
+```{r load-reference}
+gini_panel <- read_csv(RAW_GINI, show_col_types = FALSE) |>
+  rename(STATE_NAME = State, DATA_YEAR = Year, GINI_COEFFICIENT = GINI_Index)
+
+pop_total <- read_csv(RAW_POP_TOT, show_col_types = FALSE) |>
+  rename(STATE_NAME = State, DATA_YEAR = Year, TOTAL_POPULATION = Total_Population)
+
+pop_lgbt <- read_csv(RAW_POP_LGBT, show_col_types = FALSE) |>
+  rename(STATE_NAME = State, DATA_YEAR = Year, LGBT_PCT = LGBT_Pct)
+
+law_panel <- read_csv(RAW_LAW_PANEL, show_col_types = FALSE) |>
+  rename(STATE_NAME = State, DATA_YEAR = Year)
+
+cat(sprintf(
+  "Gini panel:       %s rows (%d–%d)\nTotal population: %s rows (%d–%d)\nLGBT population:  %s rows (%d–%d) — 2012+ only\nLaw panel:        %s rows (%d–%d)\n",
+  format(nrow(gini_panel), big.mark=","), min(gini_panel$DATA_YEAR), max(gini_panel$DATA_YEAR),
+  format(nrow(pop_total),  big.mark=","), min(pop_total$DATA_YEAR),  max(pop_total$DATA_YEAR),
+  format(nrow(pop_lgbt),   big.mark=","), min(pop_lgbt$DATA_YEAR),   max(pop_lgbt$DATA_YEAR),
+  format(nrow(law_panel),  big.mark=","), min(law_panel$DATA_YEAR),  max(law_panel$DATA_YEAR)
+))
+```
+
+---
+
+## 6. State × Year Aggregate
+
+The aggregate table is the primary Tableau data source. One row per state per year, with:
+
+- **Track 1** — `RATE_PER_100K_TOTAL`: incidents per 100k total population. Available for all years 1991–2024.
+- **Track 2** — `RATE_PER_100K_LGBT`: incidents per 100k LGBT adult residents. Available 2012–2024 only; `NA` for earlier years by design.
+- **`LAW_LEVEL`**: the law coverage in effect for that specific state × year (0/1/2).
+
+```{r state-year-aggregate}
+state_year_counts <- df |>
+  mutate(DATA_YEAR = as.integer(YEAR)) |>
+  group_by(DATA_YEAR, STATE_NAME) |>
+  summarise(
+    REGION_NAME   = first(REGION_NAME),
+    INCIDENTS     = n(),
+    TOTAL_VICTIMS = sum(as.integer(VICTIM_COUNT), na.rm = TRUE),
+    VIOLENT_COUNT = sum(as.integer(IS_VIOLENT),   na.rm = TRUE),
+    AVG_SEVERITY  = mean(as.numeric(SEVERITY_TIER), na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  mutate(VIOLENT_PCT = round(VIOLENT_COUNT / INCIDENTS * 100, 1))
+
+state_year <- state_year_counts |>
+  left_join(gini_panel, by = c("DATA_YEAR", "STATE_NAME")) |>
+  left_join(pop_total,  by = c("DATA_YEAR", "STATE_NAME")) |>
+  left_join(pop_lgbt,   by = c("DATA_YEAR", "STATE_NAME")) |>
+  left_join(law_panel |> select(STATE_NAME, DATA_YEAR, LAW_LEVEL, HC_LAW_SO, HC_LAW_GI),
+            by = c("DATA_YEAR", "STATE_NAME")) |>
+  mutate(
+    RATE_PER_100K_TOTAL = if_else(
+      !is.na(TOTAL_POPULATION) & TOTAL_POPULATION > 0,
+      round((INCIDENTS / TOTAL_POPULATION) * 100000, 4), NA_real_
+    ),
+    LGBT_POPULATION_EST = if_else(
+      !is.na(LGBT_PCT) & !is.na(TOTAL_POPULATION),
+      round(TOTAL_POPULATION * (LGBT_PCT / 100)), NA_real_
+    ),
+    RATE_PER_100K_LGBT = if_else(
+      !is.na(LGBT_POPULATION_EST) & LGBT_POPULATION_EST > 0,
+      round((INCIDENTS / LGBT_POPULATION_EST) * 100000, 4), NA_real_
+    )
+  )
+
+write_csv(state_year, file.path(DATA_DIR, "state_year_aggregate.csv"))
+cat(sprintf("Saved → state_year_aggregate.csv\n  %s rows | Years: %d–%d\n",
+            format(nrow(state_year), big.mark=","),
+            min(state_year$DATA_YEAR), max(state_year$DATA_YEAR)))
+```
+
+---
+
+## 7. Enriched Dataset (2010–2024)
+
+The enriched dataset joins each individual incident with its year-specific Gini coefficient, population denominators, and law coverage level. This is the primary input for the machine learning models.
+
+Unlike the full dataset (1991–2024), the enriched dataset is restricted to 2010+ because the Gini and population reference data become sparse before that window, and the ML models benefit from more complete covariate coverage.
+
+```{r enriched-dataset}
+enriched <- df |>
+  filter(YEAR >= 2010) |>
+  mutate(DATA_YEAR = as.integer(YEAR)) |>
+  left_join(gini_panel, by = c("DATA_YEAR", "STATE_NAME")) |>
+  left_join(pop_total,  by = c("DATA_YEAR", "STATE_NAME")) |>
+  left_join(pop_lgbt,   by = c("DATA_YEAR", "STATE_NAME")) |>
+  left_join(law_panel |> select(STATE_NAME, DATA_YEAR, LAW_LEVEL, HC_LAW_SO, HC_LAW_GI),
+            by = c("STATE_NAME", "DATA_YEAR")) |>
+  mutate(
+    GINI_COEFFICIENT = as.numeric(GINI_COEFFICIENT),
+    HAS_LAW          = as.integer(LAW_LEVEL > 0),
+    FULL_PROTECTION  = as.integer(LAW_LEVEL == 2),
+    LGBT_POPULATION  = if_else(
+      !is.na(LGBT_PCT) & !is.na(TOTAL_POPULATION),
+      round(TOTAL_POPULATION * (LGBT_PCT / 100)), NA_real_
+    ),
+    RATE_PER_100K_TOTAL = if_else(
+      !is.na(TOTAL_POPULATION) & TOTAL_POPULATION > 0,
+      round((1 / TOTAL_POPULATION) * 100000, 8), NA_real_
+    ),
+    RATE_PER_100K_LGBT = if_else(
+      !is.na(LGBT_POPULATION) & LGBT_POPULATION > 0,
+      round((1 / LGBT_POPULATION) * 100000, 8), NA_real_
+    )
+  )
+
+write_csv(enriched, file.path(DATA_DIR, "lgbtq_hate_crimes_enriched.csv"))
+cat(sprintf("Saved → lgbtq_hate_crimes_enriched.csv\n  %s rows | Years: %d–%d\n",
+            format(nrow(enriched), big.mark = ","),
+            min(enriched$DATA_YEAR, na.rm = TRUE),
+            max(enriched$DATA_YEAR, na.rm = TRUE)))
+```
+
+---
+
+## Pipeline Summary
+
+```{r summary}
+cat("✓ Pipeline complete. Files written to /data/\n\n")
+cat(sprintf("  lgbtq_hate_crimes_full.csv      — %s rows, 1991–%d\n",
+            format(nrow(df), big.mark=","), max(df$YEAR)))
+cat(sprintf("  lgbtq_hate_crimes_enriched.csv  — %s rows, 2010–%d\n",
+            format(nrow(enriched), big.mark=","),
+            max(enriched$DATA_YEAR, na.rm=TRUE)))
+cat(sprintf("  state_year_aggregate.csv        — %s rows, %d–%d (Tableau-ready)\n",
+            format(nrow(state_year), big.mark=","),
+            min(state_year$DATA_YEAR), max(state_year$DATA_YEAR)))
+```
+
+---
+
+## Appendix: 2026 SRS Master File Parser
+
+The FBI distributes a fixed-width SRS National Master File for agencies still on the legacy Summary Reporting System. As of 2024, most agencies report via NIBRS, so this file captures only a fraction of national incidents. Set `INCLUDE_2026_SRS <- TRUE` at the top of this notebook to append partial 2026 records to the full dataset.
+
+```{r srs-lookup-tables}
+srs_state_lookup <- tribble(
+  ~code, ~abbr, ~name,
+  "01","AL","Alabama",      "02","AK","Alaska",      "03","AR","Arkansas",
+  "04","AZ","Arizona",      "05","CA","California",  "06","CO","Colorado",
+  "07","CT","Connecticut",  "08","DE","Delaware",    "09","DC","District of Columbia",
+  "10","FL","Florida",      "11","GA","Georgia",     "12","ID","Idaho",
+  "13","IL","Illinois",     "14","IN","Indiana",     "15","IA","Iowa",
+  "16","KS","Kansas",       "17","KY","Kentucky",    "18","LA","Louisiana",
+  "19","ME","Maine",        "20","MD","Maryland",    "21","MA","Massachusetts",
+  "22","MI","Michigan",     "23","MN","Minnesota",   "24","MS","Mississippi",
+  "25","MO","Missouri",     "26","MT","Montana",     "27","NE","Nebraska",
+  "28","NV","Nevada",       "29","NH","New Hampshire","30","NJ","New Jersey",
+  "31","NM","New Mexico",   "32","NY","New York",    "33","NC","North Carolina",
+  "34","ND","North Dakota", "35","OH","Ohio",        "36","OK","Oklahoma",
+  "37","OR","Oregon",       "38","PA","Pennsylvania","39","RI","Rhode Island",
+  "40","SC","South Carolina","41","SD","South Dakota","42","TN","Tennessee",
+  "43","TX","Texas",        "44","UT","Utah",        "45","VT","Vermont",
+  "46","VA","Virginia",     "47","WA","Washington",  "48","WV","West Virginia",
+  "49","WI","Wisconsin",    "50","AK","Alaska",      "51","WY","Wyoming"
+)
+
+nibrs_offense_map <- c(
+  "09A"="Murder/Non-Negligent Homicide", "13A"="Aggravated Assault",
+  "13B"="Simple Assault",               "13C"="Intimidation",
+  "120"="Robbery",                       "200"="Arson",
+  "290"="Destruction/Damage/Vandalism",  "11A"="Forcible Rape"
+)
+
+bias_code_to_desc <- c(
+  "41"="Anti-Gay (Male)",   "42"="Anti-Lesbian",
+  "43"="Anti-Lesbian, Gay, Bisexual, or Transgender (Mixed)",
+  "44"="Anti-Heterosexual", "45"="Anti-Bisexual",
+  "71"="Anti-Transgender",  "72"="Anti-Gender Non-Conforming"
+)
+```
+
+```{r srs-parser}
+parse_srs_master_file <- function(filepath) {
+  if (!file.exists(filepath)) {
+    warning("SRS Master File not found: ", filepath); return(NULL)
+  }
+  raw_lines <- readLines(filepath, warn = FALSE)
+  ir_lines  <- raw_lines[substr(raw_lines, 1, 2) == "IR"]
+  lgbtq_bias_codes <- c("41","42","43","44","45","71","72")
+  extract_field <- function(lines, start, end) trimws(substr(lines, start, end))
+  bias_codes <- extract_field(ir_lines, 222, 223)
+  lgbtq_ir   <- ir_lines[bias_codes %in% lgbtq_bias_codes]
+  if (length(lgbtq_ir) == 0) { message("No LGBTQI+ records found."); return(NULL) }
+
+  state_abbr  <- extract_field(lgbtq_ir, 5, 6)
+  date_raw    <- extract_field(lgbtq_ir, 26, 33)
+  offense_raw <- extract_field(lgbtq_ir, 42, 44)
+  bias_raw    <- extract_field(lgbtq_ir, 222, 223)
+  inc_dates   <- as.Date(date_raw, format = "%Y%m%d")
+  yr   <- as.integer(format(inc_dates, "%Y"))
+  mo   <- as.integer(format(inc_dates, "%m"))
+  offense_names <- coalesce(nibrs_offense_map[offense_raw],
+                            paste0("Code ", offense_raw))
+
+  tibble(
+    INCIDENT_ID   = extract_field(lgbtq_ir, 14, 25),
+    YEAR          = yr, MONTH = mo,
+    MONTH_NAME    = as.character(month(inc_dates, label=TRUE, abbr=TRUE)),
+    SEASON        = season_from_month(mo),
+    STATE_ABBR    = state_abbr,
+    STATE_NAME    = srs_state_lookup$name[match(state_abbr, srs_state_lookup$abbr)],
+    BIAS_DESC     = bias_code_to_desc[bias_raw],
+    BIAS_CATEGORY = classify_bias(bias_code_to_desc[bias_raw]),
+    OFFENSE_NAME  = offense_names,
+    IS_VIOLENT    = as.integer(str_detect(offense_names,
+                      paste(violent_terms, collapse="|"))),
+    SEVERITY_TIER = severity_tier(offense_names),
+    DATA_SOURCE   = "SRS_MASTER_FILE_2026"
+  )
+}
+```
+
+```{r srs-append, eval=INCLUDE_2026_SRS}
+if (file.exists(SRS_FILE)) {
+  srs_data <- parse_srs_master_file(SRS_FILE)
+  if (!is.null(srs_data) && nrow(srs_data) > 0) {
+    df_full_tagged <- df |> select(all_of(full_cols)) |> mutate(DATA_SOURCE = "FBI_UCR_CSV")
+    common_cols    <- intersect(names(df_full_tagged), names(srs_data))
+    bind_rows(df_full_tagged |> select(all_of(common_cols)),
+              srs_data       |> select(all_of(common_cols))) |>
+      write_csv(file.path(DATA_DIR, "lgbtq_hate_crimes_full.csv"))
+    cat(sprintf("2026 SRS data appended — %d LGBTQI+ incidents added.\n", nrow(srs_data)))
+  }
+}
+```

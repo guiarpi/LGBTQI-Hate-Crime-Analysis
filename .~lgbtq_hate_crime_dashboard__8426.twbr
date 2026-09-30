@@ -1,0 +1,2956 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 20262.26.0819.2015                               -->
+<workbook _.fcp.WorkbookFingerprinting.true...author-id='80869ce5b6b892223fd265a12f48429521f30a4766012121a65683c87a23e19a' _.fcp.WorkbookFingerprinting.true...creator-author-id='2acbf3d859757f129b5b81f34427f408abae3e4f1fec4fc0decf3e1c995fac42' _.fcp.WorkbookFingerprinting.true...creator-license-type='public' _.fcp.WorkbookFingerprinting.true...creator-machine-id='2acbf3d859757f129b5b81f34427f408abae3e4f1fec4fc0decf3e1c995fac42' _.fcp.WorkbookFingerprinting.true...license-type='public' _.fcp.WorkbookFingerprinting.true...machine-id='1c3359adf3f1ad853019bcb7be4c2845590d744d29cf1a25496b6d9093c6b288' original-version='18.1' source-build='2026.2.2 (20262.26.0819.2015)' source-platform='mac' version='18.1' xml:base='https://public.tableau.com' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <AccessibleZoneTabOrder />
+    <AnimationOnByDefault />
+    <DashboardGridOverlay />
+    <MapboxVectorStylesAndLayers />
+    <MarkAnimation />
+    <ObjectModelEncapsulateLegacy />
+    <ObjectModelExtractV2 />
+    <ObjectModelTableType />
+    <SchemaViewerObjectModel />
+    <SetMembershipControl />
+    <SheetIdentifierTracking />
+    <SortTagCleanup />
+    <VConnDownstreamExtractsWithWarnings />
+    <WindowsPersistSimpleIdentifiers />
+    <_.fcp.WorkbookFingerprinting.true...WorkbookFingerprinting />
+    <WorksheetBackgroundTransparency />
+    <ZoneBackgroundTransparency />
+  </document-format-change-manifest>
+  <repository-location id='lgbtq_hate_crime_dashboard' path='/workbooks' revision='1.0' />
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <datasources>
+    <datasource hasconnection='false' inline='true' name='Parameters' version='18.1'>
+      <aliases enabled='yes' />
+      <column caption='Selected Year' datatype='integer' default-format='n0;-0' name='[Parameter 3167800450805760]' param-domain-type='range' role='measure' type='quantitative' value='2024'>
+        <calculation class='tableau' formula='2024' />
+        <range max='2024' min='1991' />
+      </column>
+      <column caption='Rate Track' datatype='string' name='[Parameter 3167800453713923]' param-domain-type='list' role='measure' type='nominal' value='&quot;Per 100K Total Pop&quot;'>
+        <calculation class='tableau' formula='&quot;Per 100K Total Pop&quot;' />
+        <members>
+          <member value='&quot;Per 100K Total Pop&quot;' />
+          <member value='&quot;Per 100K LGBT Pop (2012+)&quot;' />
+        </members>
+      </column>
+    </datasource>
+    <datasource caption='lgbtq_hate_crimes_full.csv (Multiple Connections)' inline='true' name='federated.10uuaf50uqhub21fxlf381yana8c' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='Incident Detail' name='textscan.0xelaw40mmu17h131h9iy1xwgrtt'>
+            <connection class='textscan' directory='/Users/guilhermearpi/Documents/Claude/Github Projects/LGBTQI-Hate-Crime-Analysis/data' filename='lgbtq_hate_crimes_full.csv' password='' server='' workgroup-auth-mode='as-is' />
+          </named-connection>
+          <named-connection caption='State-Year Aggregate' name='textscan.1qlqmoj04vbkrn1d4p0bf06wlzd0'>
+            <connection class='textscan' directory='/Users/guilhermearpi/Documents/Claude/Github Projects/LGBTQI-Hate-Crime-Analysis/data' filename='state_year_aggregate.csv' password='' server='' workgroup-auth-mode='as-is' />
+          </named-connection>
+        </named-connections>
+        <relation connection='textscan.0xelaw40mmu17h131h9iy1xwgrtt' name='lgbtq_hate_crimes_full.csv' table='[lgbtq_hate_crimes_full#csv]' type='table'>
+          <columns character-set='UTF-8' header='yes' locale='en_IE' separator=','>
+            <column datatype='integer' name='INCIDENT_ID' ordinal='0' />
+            <column datatype='date' date-parse-format='yyyy' name='YEAR' ordinal='1' />
+            <column datatype='integer' name='MONTH' ordinal='2' />
+            <column datatype='string' name='MONTH_NAME' ordinal='3' />
+            <column datatype='string' name='SEASON' ordinal='4' />
+            <column datatype='string' name='STATE_NAME' ordinal='5' />
+            <column datatype='string' name='STATE_ABBR' ordinal='6' />
+            <column datatype='string' name='REGION_NAME' ordinal='7' />
+            <column datatype='string' name='DIVISION_NAME' ordinal='8' />
+            <column datatype='string' name='BIAS_DESC' ordinal='9' />
+            <column datatype='string' name='BIAS_CATEGORY' ordinal='10' />
+            <column datatype='string' name='OFFENSE_NAME' ordinal='11' />
+            <column datatype='integer' name='IS_VIOLENT' ordinal='12' />
+            <column datatype='integer' name='SEVERITY_TIER' ordinal='13' />
+            <column datatype='integer' name='VICTIM_COUNT' ordinal='14' />
+            <column datatype='integer' name='TOTAL_OFFENDER_COUNT' ordinal='15' />
+            <column datatype='integer' name='ADULT_VICTIM_COUNT' ordinal='16' />
+            <column datatype='integer' name='JUVENILE_VICTIM_COUNT' ordinal='17' />
+            <column datatype='integer' name='JUVENILE_INVOLVED' ordinal='18' />
+            <column datatype='string' name='LOCATION_NAME' ordinal='19' />
+            <column datatype='string' name='LOCATION_SIMPLE' ordinal='20' />
+            <column datatype='string' name='OFFENDER_RACE' ordinal='21' />
+            <column datatype='string' name='OFFENDER_ETHNICITY' ordinal='22' />
+            <column datatype='string' name='AGENCY_TYPE_NAME' ordinal='23' />
+            <column datatype='string' name='AGENCY_TYPE_SIMPLE' ordinal='24' />
+            <column datatype='string' name='POPULATION_GROUP_DESC' ordinal='25' />
+            <column datatype='integer' name='MULTIPLE_OFFENSE_FLAG' ordinal='26' />
+            <column datatype='integer' name='MULTIPLE_BIAS_FLAG' ordinal='27' />
+            <column datatype='string' name='VICTIM_TYPES' ordinal='28' />
+          </columns>
+        </relation>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_GB&quot;</attribute>
+              <attribute datatype='string' name='currency'>&quot;€&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_IE&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>INCIDENT_ID</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[INCIDENT_ID]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>INCIDENT_ID</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>YEAR</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[YEAR]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>YEAR</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MONTH</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[MONTH]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>MONTH</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MONTH_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[MONTH_NAME]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>MONTH_NAME</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SEASON</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[SEASON]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>SEASON</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>STATE_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[STATE_NAME]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>STATE_NAME</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>STATE_ABBR</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[STATE_ABBR]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>STATE_ABBR</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>REGION_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[REGION_NAME]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>REGION_NAME</remote-alias>
+            <ordinal>7</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DIVISION_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[DIVISION_NAME]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>DIVISION_NAME</remote-alias>
+            <ordinal>8</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>BIAS_DESC</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[BIAS_DESC]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>BIAS_DESC</remote-alias>
+            <ordinal>9</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>BIAS_CATEGORY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[BIAS_CATEGORY]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>BIAS_CATEGORY</remote-alias>
+            <ordinal>10</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>OFFENSE_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[OFFENSE_NAME]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>OFFENSE_NAME</remote-alias>
+            <ordinal>11</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>IS_VIOLENT</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[IS_VIOLENT]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>IS_VIOLENT</remote-alias>
+            <ordinal>12</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>SEVERITY_TIER</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[SEVERITY_TIER]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>SEVERITY_TIER</remote-alias>
+            <ordinal>13</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>VICTIM_COUNT</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[VICTIM_COUNT]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>VICTIM_COUNT</remote-alias>
+            <ordinal>14</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>TOTAL_OFFENDER_COUNT</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[TOTAL_OFFENDER_COUNT]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>TOTAL_OFFENDER_COUNT</remote-alias>
+            <ordinal>15</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>ADULT_VICTIM_COUNT</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[ADULT_VICTIM_COUNT]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>ADULT_VICTIM_COUNT</remote-alias>
+            <ordinal>16</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>JUVENILE_VICTIM_COUNT</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[JUVENILE_VICTIM_COUNT]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>JUVENILE_VICTIM_COUNT</remote-alias>
+            <ordinal>17</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>JUVENILE_INVOLVED</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[JUVENILE_INVOLVED]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>JUVENILE_INVOLVED</remote-alias>
+            <ordinal>18</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>LOCATION_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[LOCATION_NAME]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>LOCATION_NAME</remote-alias>
+            <ordinal>19</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>LOCATION_SIMPLE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[LOCATION_SIMPLE]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>LOCATION_SIMPLE</remote-alias>
+            <ordinal>20</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>OFFENDER_RACE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[OFFENDER_RACE]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>OFFENDER_RACE</remote-alias>
+            <ordinal>21</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>OFFENDER_ETHNICITY</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[OFFENDER_ETHNICITY]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>OFFENDER_ETHNICITY</remote-alias>
+            <ordinal>22</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>AGENCY_TYPE_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[AGENCY_TYPE_NAME]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>AGENCY_TYPE_NAME</remote-alias>
+            <ordinal>23</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>AGENCY_TYPE_SIMPLE</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[AGENCY_TYPE_SIMPLE]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>AGENCY_TYPE_SIMPLE</remote-alias>
+            <ordinal>24</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>POPULATION_GROUP_DESC</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[POPULATION_GROUP_DESC]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>POPULATION_GROUP_DESC</remote-alias>
+            <ordinal>25</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MULTIPLE_OFFENSE_FLAG</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[MULTIPLE_OFFENSE_FLAG]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>MULTIPLE_OFFENSE_FLAG</remote-alias>
+            <ordinal>26</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>MULTIPLE_BIAS_FLAG</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[MULTIPLE_BIAS_FLAG]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>MULTIPLE_BIAS_FLAG</remote-alias>
+            <ordinal>27</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>VICTIM_TYPES</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[VICTIM_TYPES]</local-name>
+            <parent-name>[lgbtq_hate_crimes_full.csv]</parent-name>
+            <remote-alias>VICTIM_TYPES</remote-alias>
+            <ordinal>28</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]</object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='Adult Victim Count' datatype='integer' name='[ADULT_VICTIM_COUNT]' role='measure' type='quantitative' />
+      <column caption='Agency Type Name' datatype='string' name='[AGENCY_TYPE_NAME]' role='dimension' type='nominal' />
+      <column caption='Agency Type Simple' datatype='string' name='[AGENCY_TYPE_SIMPLE]' role='dimension' type='nominal' />
+      <column caption='Bias Category' datatype='string' name='[BIAS_CATEGORY]' role='dimension' type='nominal' />
+      <column caption='Bias Desc' datatype='string' name='[BIAS_DESC]' role='dimension' type='nominal' />
+      <column caption='[Is Violent Label]' datatype='string' name='[Calculation_3167800455938060]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='IF [IS_VIOLENT] = 1 THEN &quot;Violent&quot; ELSE &quot;Non-Violent&quot; END' />
+      </column>
+      <column caption='[Month Order]' datatype='integer' name='[Calculation_3167800456015885]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='[MONTH]' />
+      </column>
+      <column caption='Violent Share' datatype='real' name='[Calculation_3167800464490512]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM([Violent Count]) / SUM([Incidents])' />
+      </column>
+      <column caption='Division Name' datatype='string' name='[DIVISION_NAME]' role='dimension' type='nominal' />
+      <column caption='Incident Id' datatype='integer' name='[INCIDENT_ID]' role='dimension' type='ordinal' />
+      <column caption='Is Violent' datatype='integer' name='[IS_VIOLENT]' role='measure' type='quantitative' />
+      <column caption='Juvenile Involved' datatype='integer' name='[JUVENILE_INVOLVED]' role='measure' type='quantitative' />
+      <column caption='Juvenile Victim Count' datatype='integer' name='[JUVENILE_VICTIM_COUNT]' role='measure' type='quantitative' />
+      <column caption='Location Name' datatype='string' name='[LOCATION_NAME]' role='dimension' type='nominal' />
+      <column caption='Location Simple' datatype='string' name='[LOCATION_SIMPLE]' role='dimension' type='nominal' />
+      <column caption='Month' datatype='integer' name='[MONTH]' role='dimension' type='quantitative' />
+      <column caption='Month Name' datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
+      <column caption='Multiple Bias Flag' datatype='integer' name='[MULTIPLE_BIAS_FLAG]' role='measure' type='quantitative' />
+      <column caption='Multiple Offense Flag' datatype='integer' name='[MULTIPLE_OFFENSE_FLAG]' role='measure' type='quantitative' />
+      <column caption='Offender Ethnicity' datatype='string' name='[OFFENDER_ETHNICITY]' role='dimension' type='nominal' />
+      <column caption='Offender Race' datatype='string' name='[OFFENDER_RACE]' role='dimension' type='nominal' />
+      <column caption='Offense Name' datatype='string' name='[OFFENSE_NAME]' role='dimension' type='nominal' />
+      <column caption='Population Group Desc' datatype='string' name='[POPULATION_GROUP_DESC]' role='dimension' type='nominal' />
+      <column caption='Region Name' datatype='string' name='[REGION_NAME]' role='dimension' type='nominal' />
+      <column caption='Season' datatype='string' name='[SEASON]' role='dimension' type='nominal' />
+      <column caption='Severity Tier' datatype='integer' name='[SEVERITY_TIER]' role='measure' type='quantitative' />
+      <column caption='State Abbr' datatype='string' name='[STATE_ABBR]' role='dimension' semantic-role='[State].[Name]' type='nominal' />
+      <column caption='State Name' datatype='string' name='[STATE_NAME]' role='dimension' semantic-role='[State].[Name]' type='nominal' />
+      <column caption='Total Offender Count' datatype='integer' name='[TOTAL_OFFENDER_COUNT]' role='measure' type='quantitative' />
+      <column caption='Victim Count' datatype='integer' name='[VICTIM_COUNT]' role='measure' type='quantitative' />
+      <column caption='Victim Types' datatype='string' name='[VICTIM_TYPES]' role='dimension' type='nominal' />
+      <column caption='Year' datatype='date' name='[YEAR]' role='dimension' type='quantitative' />
+      <column caption='lgbtq_hate_crimes_full.csv' datatype='table' name='[__tableau_internal_object_id__].[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]' role='measure' type='quantitative' />
+      <column-instance column='[BIAS_CATEGORY]' derivation='None' name='[none:BIAS_CATEGORY:nk]' pivot='key' type='nominal' />
+      <extract count='-1' enabled='true' object-id='' units='records' user-specific='false'>
+        <connection access_mode='readonly' author-locale='en_US' class='hyper' dbname='/var/folders/jw/0gq_bn1s55zcjqnxjbjrdc9r0000gn/T/tableau-temp/#TableauTemp_0z7379w1z0rseu169s9rv1j7i5f8.hyper' default-settings='hyper' schema='Extract' sslmode='' tablename='Extract' update-time='09/29/2026 11:50:16 AM' username='tableau_internal_user'>
+          <relation name='Extract' table='[Extract].[Extract]' type='table' />
+          <metadata-records>
+            <metadata-record class='column'>
+              <remote-name>INCIDENT_ID</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[INCIDENT_ID]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>INCIDENT_ID</remote-alias>
+              <ordinal>0</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>45318</approx-count>
+              <contains-null>true</contains-null>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>YEAR</remote-name>
+              <remote-type>133</remote-type>
+              <local-name>[YEAR]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>YEAR</remote-alias>
+              <ordinal>1</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>date</local-type>
+              <aggregation>Year</aggregation>
+              <approx-count>34</approx-count>
+              <contains-null>true</contains-null>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>MONTH</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[MONTH]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>MONTH</remote-alias>
+              <ordinal>2</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>12</approx-count>
+              <contains-null>true</contains-null>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>MONTH_NAME</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[MONTH_NAME]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>MONTH_NAME</remote-alias>
+              <ordinal>3</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>12</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>SEASON</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[SEASON]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>SEASON</remote-alias>
+              <ordinal>4</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>4</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>STATE_NAME</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[STATE_NAME]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>STATE_NAME</remote-alias>
+              <ordinal>5</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>67</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>STATE_ABBR</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[STATE_ABBR]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>STATE_ABBR</remote-alias>
+              <ordinal>6</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>67</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>REGION_NAME</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[REGION_NAME]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>REGION_NAME</remote-alias>
+              <ordinal>7</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>10</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>DIVISION_NAME</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[DIVISION_NAME]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>DIVISION_NAME</remote-alias>
+              <ordinal>8</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>15</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>BIAS_DESC</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[BIAS_DESC]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>BIAS_DESC</remote-alias>
+              <ordinal>9</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>110</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>BIAS_CATEGORY</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[BIAS_CATEGORY]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>BIAS_CATEGORY</remote-alias>
+              <ordinal>10</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>6</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>OFFENSE_NAME</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[OFFENSE_NAME]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>OFFENSE_NAME</remote-alias>
+              <ordinal>11</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>185</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>IS_VIOLENT</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[IS_VIOLENT]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>IS_VIOLENT</remote-alias>
+              <ordinal>12</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>2</approx-count>
+              <contains-null>true</contains-null>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>SEVERITY_TIER</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[SEVERITY_TIER]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>SEVERITY_TIER</remote-alias>
+              <ordinal>13</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>3</approx-count>
+              <contains-null>true</contains-null>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>VICTIM_COUNT</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[VICTIM_COUNT]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>VICTIM_COUNT</remote-alias>
+              <ordinal>14</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>4</approx-count>
+              <contains-null>true</contains-null>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>TOTAL_OFFENDER_COUNT</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[TOTAL_OFFENDER_COUNT]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>TOTAL_OFFENDER_COUNT</remote-alias>
+              <ordinal>15</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>13</approx-count>
+              <contains-null>true</contains-null>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>ADULT_VICTIM_COUNT</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[ADULT_VICTIM_COUNT]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>ADULT_VICTIM_COUNT</remote-alias>
+              <ordinal>16</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>10</approx-count>
+              <contains-null>true</contains-null>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>JUVENILE_VICTIM_COUNT</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[JUVENILE_VICTIM_COUNT]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>JUVENILE_VICTIM_COUNT</remote-alias>
+              <ordinal>17</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>14</approx-count>
+              <contains-null>true</contains-null>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>JUVENILE_INVOLVED</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[JUVENILE_INVOLVED]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>JUVENILE_INVOLVED</remote-alias>
+              <ordinal>18</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>2</approx-count>
+              <contains-null>true</contains-null>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>LOCATION_NAME</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[LOCATION_NAME]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>LOCATION_NAME</remote-alias>
+              <ordinal>19</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>53</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>LOCATION_SIMPLE</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[LOCATION_SIMPLE]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>LOCATION_SIMPLE</remote-alias>
+              <ordinal>20</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>7</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>OFFENDER_RACE</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[OFFENDER_RACE]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>OFFENDER_RACE</remote-alias>
+              <ordinal>21</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>7</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>OFFENDER_ETHNICITY</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[OFFENDER_ETHNICITY]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>OFFENDER_ETHNICITY</remote-alias>
+              <ordinal>22</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>5</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>AGENCY_TYPE_NAME</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[AGENCY_TYPE_NAME]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>AGENCY_TYPE_NAME</remote-alias>
+              <ordinal>23</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>11</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>AGENCY_TYPE_SIMPLE</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[AGENCY_TYPE_SIMPLE]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>AGENCY_TYPE_SIMPLE</remote-alias>
+              <ordinal>24</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>5</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>POPULATION_GROUP_DESC</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[POPULATION_GROUP_DESC]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>POPULATION_GROUP_DESC</remote-alias>
+              <ordinal>25</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>23</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>MULTIPLE_OFFENSE_FLAG</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[MULTIPLE_OFFENSE_FLAG]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>MULTIPLE_OFFENSE_FLAG</remote-alias>
+              <ordinal>26</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>2</approx-count>
+              <contains-null>true</contains-null>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>MULTIPLE_BIAS_FLAG</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[MULTIPLE_BIAS_FLAG]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>MULTIPLE_BIAS_FLAG</remote-alias>
+              <ordinal>27</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>2</approx-count>
+              <contains-null>true</contains-null>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>VICTIM_TYPES</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[VICTIM_TYPES]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>VICTIM_TYPES</remote-alias>
+              <ordinal>28</ordinal>
+              <family>lgbtq_hate_crimes_full.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>25</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+            </metadata-record>
+          </metadata-records>
+        </connection>
+      </extract>
+      <layout dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <style>
+        <style-rule element='mark'>
+          <encoding attr='color' field='[none:BIAS_CATEGORY:nk]' type='palette'>
+            <map to='#2196f3'>
+              <bucket>&quot;Anti-Gay (Male)&quot;</bucket>
+            </map>
+            <map to='#4caf50'>
+              <bucket>&quot;Anti-Bisexual&quot;</bucket>
+            </map>
+            <map to='#795548'>
+              <bucket>&quot;Anti-Gender Non-Conforming&quot;</bucket>
+            </map>
+            <map to='#9c27b0'>
+              <bucket>&quot;Anti-LGBTQ (General)&quot;</bucket>
+            </map>
+            <map to='#e91e63'>
+              <bucket>&quot;Anti-Lesbian&quot;</bucket>
+            </map>
+            <map to='#ff9800'>
+              <bucket>&quot;Anti-Transgender&quot;</bucket>
+            </map>
+          </encoding>
+        </style-rule>
+      </style>
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;Ireland&quot;' />
+      </semantic-values>
+      <date-options start-of-week='monday' />
+      <object-graph>
+        <objects>
+          <object caption='lgbtq_hate_crimes_full.csv' id='lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207'>
+            <properties context=''>
+              <relation connection='textscan.0xelaw40mmu17h131h9iy1xwgrtt' name='lgbtq_hate_crimes_full.csv' table='[lgbtq_hate_crimes_full#csv]' type='table'>
+                <columns character-set='UTF-8' header='yes' locale='en_IE' separator=','>
+                  <column datatype='integer' name='INCIDENT_ID' ordinal='0' />
+                  <column datatype='date' date-parse-format='yyyy' name='YEAR' ordinal='1' />
+                  <column datatype='integer' name='MONTH' ordinal='2' />
+                  <column datatype='string' name='MONTH_NAME' ordinal='3' />
+                  <column datatype='string' name='SEASON' ordinal='4' />
+                  <column datatype='string' name='STATE_NAME' ordinal='5' />
+                  <column datatype='string' name='STATE_ABBR' ordinal='6' />
+                  <column datatype='string' name='REGION_NAME' ordinal='7' />
+                  <column datatype='string' name='DIVISION_NAME' ordinal='8' />
+                  <column datatype='string' name='BIAS_DESC' ordinal='9' />
+                  <column datatype='string' name='BIAS_CATEGORY' ordinal='10' />
+                  <column datatype='string' name='OFFENSE_NAME' ordinal='11' />
+                  <column datatype='integer' name='IS_VIOLENT' ordinal='12' />
+                  <column datatype='integer' name='SEVERITY_TIER' ordinal='13' />
+                  <column datatype='integer' name='VICTIM_COUNT' ordinal='14' />
+                  <column datatype='integer' name='TOTAL_OFFENDER_COUNT' ordinal='15' />
+                  <column datatype='integer' name='ADULT_VICTIM_COUNT' ordinal='16' />
+                  <column datatype='integer' name='JUVENILE_VICTIM_COUNT' ordinal='17' />
+                  <column datatype='integer' name='JUVENILE_INVOLVED' ordinal='18' />
+                  <column datatype='string' name='LOCATION_NAME' ordinal='19' />
+                  <column datatype='string' name='LOCATION_SIMPLE' ordinal='20' />
+                  <column datatype='string' name='OFFENDER_RACE' ordinal='21' />
+                  <column datatype='string' name='OFFENDER_ETHNICITY' ordinal='22' />
+                  <column datatype='string' name='AGENCY_TYPE_NAME' ordinal='23' />
+                  <column datatype='string' name='AGENCY_TYPE_SIMPLE' ordinal='24' />
+                  <column datatype='string' name='POPULATION_GROUP_DESC' ordinal='25' />
+                  <column datatype='integer' name='MULTIPLE_OFFENSE_FLAG' ordinal='26' />
+                  <column datatype='integer' name='MULTIPLE_BIAS_FLAG' ordinal='27' />
+                  <column datatype='string' name='VICTIM_TYPES' ordinal='28' />
+                </columns>
+              </relation>
+            </properties>
+            <properties context='extract'>
+              <relation name='Extract' table='[Extract].[Extract]' type='table' />
+            </properties>
+          </object>
+        </objects>
+      </object-graph>
+    </datasource>
+    <datasource caption='state_year_aggregate' inline='true' name='federated.170i96e0kiig2e1465cre1gwcxur' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='State-Year Aggregate' name='textscan.1d4xjyh0nweo6n12ug2h00ednn39'>
+            <connection class='textscan' directory='/Users/guilhermearpi/Documents/Claude/Github Projects/LGBTQI-Hate-Crime-Analysis/data' filename='state_year_aggregate.csv' password='' server='' workgroup-auth-mode='as-is' />
+          </named-connection>
+        </named-connections>
+        <relation connection='textscan.1d4xjyh0nweo6n12ug2h00ednn39' name='state_year_aggregate.csv' table='[state_year_aggregate#csv]' type='table'>
+          <columns character-set='UTF-8' header='yes' locale='en_IE' separator=','>
+            <column datatype='date' date-parse-format='yyyy' name='DATA_YEAR' ordinal='0' />
+            <column datatype='string' name='STATE_NAME' ordinal='1' />
+            <column datatype='string' name='REGION_NAME' ordinal='2' />
+            <column datatype='integer' name='INCIDENTS' ordinal='3' />
+            <column datatype='integer' name='TOTAL_VICTIMS' ordinal='4' />
+            <column datatype='integer' name='VIOLENT_COUNT' ordinal='5' />
+            <column datatype='real' name='AVG_SEVERITY' ordinal='6' />
+            <column datatype='real' name='VIOLENT_PCT' ordinal='7' />
+            <column datatype='real' name='GINI_COEFFICIENT' ordinal='8' />
+            <column datatype='integer' name='TOTAL_POPULATION' ordinal='9' />
+            <column datatype='string' name='LGBT_PCT' ordinal='10' />
+            <column datatype='string' name='LAW_LEVEL' ordinal='11' />
+            <column datatype='integer' name='HC_LAW_SO' ordinal='12' />
+            <column datatype='integer' name='HC_LAW_GI' ordinal='13' />
+            <column datatype='real' name='RATE_PER_100K_TOTAL' ordinal='14' />
+            <column datatype='integer' name='LGBT_POPULATION_EST' ordinal='15' />
+            <column datatype='real' name='RATE_PER_100K_LGBT' ordinal='16' />
+          </columns>
+        </relation>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[state_year_aggregate.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_GB&quot;</attribute>
+              <attribute datatype='string' name='currency'>&quot;€&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_IE&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>DATA_YEAR</remote-name>
+            <remote-type>7</remote-type>
+            <local-name>[DATA_YEAR]</local-name>
+            <parent-name>[state_year_aggregate.csv]</parent-name>
+            <remote-alias>DATA_YEAR</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>date</local-type>
+            <aggregation>Year</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>STATE_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[STATE_NAME]</local-name>
+            <parent-name>[state_year_aggregate.csv]</parent-name>
+            <remote-alias>STATE_NAME</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>REGION_NAME</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[REGION_NAME]</local-name>
+            <parent-name>[state_year_aggregate.csv]</parent-name>
+            <remote-alias>REGION_NAME</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>INCIDENTS</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[INCIDENTS]</local-name>
+            <parent-name>[state_year_aggregate.csv]</parent-name>
+            <remote-alias>INCIDENTS</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>TOTAL_VICTIMS</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[TOTAL_VICTIMS]</local-name>
+            <parent-name>[state_year_aggregate.csv]</parent-name>
+            <remote-alias>TOTAL_VICTIMS</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>VIOLENT_COUNT</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[VIOLENT_COUNT]</local-name>
+            <parent-name>[state_year_aggregate.csv]</parent-name>
+            <remote-alias>VIOLENT_COUNT</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>AVG_SEVERITY</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[AVG_SEVERITY]</local-name>
+            <parent-name>[state_year_aggregate.csv]</parent-name>
+            <remote-alias>AVG_SEVERITY</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>VIOLENT_PCT</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[VIOLENT_PCT]</local-name>
+            <parent-name>[state_year_aggregate.csv]</parent-name>
+            <remote-alias>VIOLENT_PCT</remote-alias>
+            <ordinal>7</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>GINI_COEFFICIENT</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[GINI_COEFFICIENT]</local-name>
+            <parent-name>[state_year_aggregate.csv]</parent-name>
+            <remote-alias>GINI_COEFFICIENT</remote-alias>
+            <ordinal>8</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>TOTAL_POPULATION</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[TOTAL_POPULATION]</local-name>
+            <parent-name>[state_year_aggregate.csv]</parent-name>
+            <remote-alias>TOTAL_POPULATION</remote-alias>
+            <ordinal>9</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>LGBT_PCT</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[LGBT_PCT]</local-name>
+            <parent-name>[state_year_aggregate.csv]</parent-name>
+            <remote-alias>LGBT_PCT</remote-alias>
+            <ordinal>10</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>LAW_LEVEL</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[LAW_LEVEL]</local-name>
+            <parent-name>[state_year_aggregate.csv]</parent-name>
+            <remote-alias>LAW_LEVEL</remote-alias>
+            <ordinal>11</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RGB' />
+            <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>HC_LAW_SO</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[HC_LAW_SO]</local-name>
+            <parent-name>[state_year_aggregate.csv]</parent-name>
+            <remote-alias>HC_LAW_SO</remote-alias>
+            <ordinal>12</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>HC_LAW_GI</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[HC_LAW_GI]</local-name>
+            <parent-name>[state_year_aggregate.csv]</parent-name>
+            <remote-alias>HC_LAW_GI</remote-alias>
+            <ordinal>13</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>RATE_PER_100K_TOTAL</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[RATE_PER_100K_TOTAL]</local-name>
+            <parent-name>[state_year_aggregate.csv]</parent-name>
+            <remote-alias>RATE_PER_100K_TOTAL</remote-alias>
+            <ordinal>14</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>LGBT_POPULATION_EST</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[LGBT_POPULATION_EST]</local-name>
+            <parent-name>[state_year_aggregate.csv]</parent-name>
+            <remote-alias>LGBT_POPULATION_EST</remote-alias>
+            <ordinal>15</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>RATE_PER_100K_LGBT</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[RATE_PER_100K_LGBT]</local-name>
+            <parent-name>[state_year_aggregate.csv]</parent-name>
+            <remote-alias>RATE_PER_100K_LGBT</remote-alias>
+            <ordinal>16</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='Avg Severity' datatype='real' name='[AVG_SEVERITY]' role='measure' type='quantitative' />
+      <column caption='[Law Level Label]' datatype='string' name='[Calculation_3167800454250500]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='IF [LAW_LEVEL] = &quot;2&quot; THEN &quot;Full Protection&quot;&#10;ELSEIF [LAW_LEVEL] = &quot;1&quot; THEN &quot;SO Only&quot;&#10;ELSEIF [LAW_LEVEL] = &quot;0&quot; THEN &quot;No Law&quot;&#10;ELSE &quot;Unknown&quot;&#10;END' />
+      </column>
+      <column caption='[Law Level Order]' datatype='integer' name='[Calculation_3167800454344709]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='IF [LAW_LEVEL] = &quot;0&quot; THEN 1&#10;ELSEIF [LAW_LEVEL] = &quot;1&quot; THEN 2&#10;ELSEIF [LAW_LEVEL] = &quot;2&quot; THEN 3&#10;ELSE 4&#10;END' />
+      </column>
+      <column caption='[Active Rate]' datatype='real' name='[Calculation_3167800454389766]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='IF [Parameters].[Parameter 3167800453713923] = &quot;Per 100K Total Pop&quot;&#10;THEN [RATE_PER_100K_TOTAL]&#10;ELSE [RATE_PER_100K_LGBT]&#10;END' />
+      </column>
+      <column caption='[Violent Pct Label]' datatype='string' name='[Calculation_3167800454807559]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='STR(ROUND([VIOLENT_PCT] * 100, 1)) + &quot;%&quot;' />
+      </column>
+      <column caption='[Rate Availability Flag]' datatype='string' name='[Calculation_3167800454860808]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='IF [Parameters].[Parameter 3167800453713923] = &quot;Track 2 — Per 100K LGBT Pop (2012+)&quot;&#10;   AND YEAR([DATA_YEAR]) &lt; 2012&#10;THEN &quot;⚠ No LGBT pop data pre-2012&quot;&#10;ELSE &quot;&quot;&#10;END' />
+      </column>
+      <column caption='[In Selected Year]' datatype='boolean' name='[Calculation_3167800454901769]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='YEAR([DATA_YEAR]) = [Parameters].[Parameter 3167800450805760]' />
+      </column>
+      <column caption='[YoY Change]' datatype='real' name='[Calculation_3167800454934538]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='IF LOOKUP(SUM([INCIDENTS]), -1) = 0 THEN NULL&#10;ELSE (SUM([INCIDENTS]) - LOOKUP(SUM([INCIDENTS]), -1))&#10;     / ABS(LOOKUP(SUM([INCIDENTS]), -1))&#10;END'>
+          <table-calc ordering-type='Rows' />
+        </calculation>
+      </column>
+      <column caption='[Gini Tier]' datatype='string' name='[Calculation_3167800455831563]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='IF [GINI_COEFFICIENT] &lt; 0.45 THEN &quot;Low Inequality&quot;&#10;ELSEIF [GINI_COEFFICIENT] &lt; 0.50 THEN &quot;Medium Inequality&quot;&#10;ELSE &quot;High Inequality&quot;&#10;END' />
+      </column>
+      <column caption='[Violent Share]' datatype='real' name='[Calculation_3167800464904209]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='SUM([VIOLENT_COUNT]) / SUM([INCIDENTS])' />
+      </column>
+      <column caption='[States With Law]' datatype='integer' name='[Calculation_3167800467066898]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='COUNTD(IF [LAW_LEVEL] &lt;&gt; &quot;0&quot; AND [LAW_LEVEL] &lt;&gt; &quot;NA&quot; THEN [STATE_NAME] END)' />
+      </column>
+      <column caption='Data Year' datatype='date' name='[DATA_YEAR]' role='dimension' type='quantitative' />
+      <column caption='Gini Coefficient' datatype='real' name='[GINI_COEFFICIENT]' role='measure' type='quantitative' />
+      <column caption='Hc Law Gi' datatype='integer' name='[HC_LAW_GI]' role='measure' type='quantitative' />
+      <column caption='Hc Law So' datatype='integer' name='[HC_LAW_SO]' role='measure' type='quantitative' />
+      <column caption='Incidents' datatype='integer' name='[INCIDENTS]' role='measure' type='quantitative' />
+      <column caption='Law Level' datatype='string' default-role='measure' default-type='quantitative' name='[LAW_LEVEL]' role='dimension' type='nominal' />
+      <column caption='Lgbt Pct' datatype='string' name='[LGBT_PCT]' role='dimension' type='nominal' />
+      <column caption='Lgbt Population Est' datatype='integer' name='[LGBT_POPULATION_EST]' role='dimension' type='ordinal' />
+      <column caption='Rate Per 100K Lgbt' datatype='real' name='[RATE_PER_100K_LGBT]' role='dimension' type='ordinal' />
+      <column caption='Rate Per 100K Total' datatype='real' name='[RATE_PER_100K_TOTAL]' role='measure' type='quantitative' />
+      <column caption='Region Name' datatype='string' name='[REGION_NAME]' role='dimension' type='nominal' />
+      <column caption='State Name' datatype='string' name='[STATE_NAME]' role='dimension' semantic-role='[State].[Name]' type='nominal' />
+      <column caption='Total Population' datatype='integer' name='[TOTAL_POPULATION]' role='measure' type='quantitative' />
+      <column caption='Total Victims' datatype='integer' name='[TOTAL_VICTIMS]' role='measure' type='quantitative' />
+      <column caption='Violent Count' datatype='integer' name='[VIOLENT_COUNT]' role='measure' type='quantitative' />
+      <column caption='Violent Pct' datatype='real' name='[VIOLENT_PCT]' role='measure' type='quantitative' />
+      <column caption='state_year_aggregate.csv' datatype='table' name='[__tableau_internal_object_id__].[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]' role='measure' type='quantitative' />
+      <column-instance column='[Calculation_3167800454389766]' derivation='Avg' name='[avg:Calculation_3167800454389766:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[LAW_LEVEL]' derivation='Count' name='[cnt:LAW_LEVEL:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[Calculation_3167800454250500]' derivation='None' name='[none:Calculation_3167800454250500:nk]' pivot='key' type='nominal' />
+      <column-instance column='[Calculation_3167800454389766]' derivation='Sum' name='[sum:Calculation_3167800454389766:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[INCIDENTS]' derivation='Sum' name='[sum:INCIDENTS:qk]' pivot='key' type='quantitative' />
+      <group caption='Action (State Name)' hidden='true' name='[Action (State Name)]' name-style='unqualified' user:auto-column='sheet_link'>
+        <groupfilter function='crossjoin'>
+          <groupfilter function='level-members' level='[STATE_NAME]' />
+        </groupfilter>
+      </group>
+      <extract count='-1' enabled='true' object-id='' units='records' user-specific='false'>
+        <connection access_mode='readonly' author-locale='en_US' class='hyper' dbname='/var/folders/jw/0gq_bn1s55zcjqnxjbjrdc9r0000gn/T/tableau-temp/#TableauTemp_0z8tw0z19pdpmn1g43j7o01s8dg0.hyper' default-settings='hyper' schema='Extract' sslmode='' tablename='Extract' update-time='09/29/2026 11:50:21 AM' username='tableau_internal_user'>
+          <relation name='Extract' table='[Extract].[Extract]' type='table' />
+          <metadata-records>
+            <metadata-record class='column'>
+              <remote-name>DATA_YEAR</remote-name>
+              <remote-type>133</remote-type>
+              <local-name>[DATA_YEAR]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>DATA_YEAR</remote-alias>
+              <ordinal>0</ordinal>
+              <family>state_year_aggregate.csv</family>
+              <local-type>date</local-type>
+              <aggregation>Year</aggregation>
+              <approx-count>34</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>STATE_NAME</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[STATE_NAME]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>STATE_NAME</remote-alias>
+              <ordinal>1</ordinal>
+              <family>state_year_aggregate.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>53</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+              <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>REGION_NAME</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[REGION_NAME]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>REGION_NAME</remote-alias>
+              <ordinal>2</ordinal>
+              <family>state_year_aggregate.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>6</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+              <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>INCIDENTS</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[INCIDENTS]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>INCIDENTS</remote-alias>
+              <ordinal>3</ordinal>
+              <family>state_year_aggregate.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>146</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>TOTAL_VICTIMS</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[TOTAL_VICTIMS]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>TOTAL_VICTIMS</remote-alias>
+              <ordinal>4</ordinal>
+              <family>state_year_aggregate.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>151</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>VIOLENT_COUNT</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[VIOLENT_COUNT]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>VIOLENT_COUNT</remote-alias>
+              <ordinal>5</ordinal>
+              <family>state_year_aggregate.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>98</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>AVG_SEVERITY</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[AVG_SEVERITY]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>AVG_SEVERITY</remote-alias>
+              <ordinal>6</ordinal>
+              <family>state_year_aggregate.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>481</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>VIOLENT_PCT</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[VIOLENT_PCT]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>VIOLENT_PCT</remote-alias>
+              <ordinal>7</ordinal>
+              <family>state_year_aggregate.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>323</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>GINI_COEFFICIENT</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[GINI_COEFFICIENT]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>GINI_COEFFICIENT</remote-alias>
+              <ordinal>8</ordinal>
+              <family>state_year_aggregate.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>494</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>TOTAL_POPULATION</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[TOTAL_POPULATION]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>TOTAL_POPULATION</remote-alias>
+              <ordinal>9</ordinal>
+              <family>state_year_aggregate.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>1351</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>LGBT_PCT</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[LGBT_PCT]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>LGBT_PCT</remote-alias>
+              <ordinal>10</ordinal>
+              <family>state_year_aggregate.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>187</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+              <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>LAW_LEVEL</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[LAW_LEVEL]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>LAW_LEVEL</remote-alias>
+              <ordinal>11</ordinal>
+              <family>state_year_aggregate.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>4</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+              <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>HC_LAW_SO</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[HC_LAW_SO]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>HC_LAW_SO</remote-alias>
+              <ordinal>12</ordinal>
+              <family>state_year_aggregate.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>3</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>HC_LAW_GI</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[HC_LAW_GI]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>HC_LAW_GI</remote-alias>
+              <ordinal>13</ordinal>
+              <family>state_year_aggregate.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>3</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>RATE_PER_100K_TOTAL</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[RATE_PER_100K_TOTAL]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>RATE_PER_100K_TOTAL</remote-alias>
+              <ordinal>14</ordinal>
+              <family>state_year_aggregate.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>1217</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>LGBT_POPULATION_EST</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[LGBT_POPULATION_EST]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>LGBT_POPULATION_EST</remote-alias>
+              <ordinal>15</ordinal>
+              <family>state_year_aggregate.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>924</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>RATE_PER_100K_LGBT</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[RATE_PER_100K_LGBT]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>RATE_PER_100K_LGBT</remote-alias>
+              <ordinal>16</ordinal>
+              <family>state_year_aggregate.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>924</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064]</object-id>
+            </metadata-record>
+          </metadata-records>
+        </connection>
+      </extract>
+      <layout dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <style>
+        <style-rule element='mark'>
+          <encoding attr='color' field='[:Measure Names]' type='palette'>
+            <map to='#1565c0'>
+              <bucket>&quot;[federated.170i96e0kiig2e1465cre1gwcxur].[sum:INCIDENTS:qk]&quot;</bucket>
+            </map>
+            <map to='#4e79a7'>
+              <bucket>&quot;[federated.170i96e0kiig2e1465cre1gwcxur]&quot;</bucket>
+            </map>
+            <map to='#b71c1c'>
+              <bucket>&quot;[federated.170i96e0kiig2e1465cre1gwcxur].[avg:Calculation_3167800454389766:qk]&quot;</bucket>
+            </map>
+            <map to='#f28e2b'>
+              <bucket>&quot;[federated.170i96e0kiig2e1465cre1gwcxur].[cnt:LAW_LEVEL:qk]&quot;</bucket>
+            </map>
+            <map to='#f28e2b'>
+              <bucket>&quot;[federated.170i96e0kiig2e1465cre1gwcxur].[none:Calculation_3167800454250500:nk]&quot;</bucket>
+            </map>
+            <map to='#f28e2b'>
+              <bucket>&quot;[federated.170i96e0kiig2e1465cre1gwcxur].[sum:Calculation_3167800454389766:qk]&quot;</bucket>
+            </map>
+          </encoding>
+          <encoding attr='color' field='[none:Calculation_3167800454250500:nk]' type='palette'>
+            <map to='#59a14f'>
+              <bucket>&quot;Full Protection&quot;</bucket>
+            </map>
+            <map to='#76b7b2'>
+              <bucket>&quot;Unknown&quot;</bucket>
+            </map>
+            <map to='#e15759'>
+              <bucket>&quot;No Law&quot;</bucket>
+            </map>
+            <map to='#ff9da7'>
+              <bucket>&quot;SO Only&quot;</bucket>
+            </map>
+          </encoding>
+        </style-rule>
+      </style>
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+        <semantic-value key='[State].[Name]' value='%null%' />
+      </semantic-values>
+      <date-options start-of-week='monday' />
+      <datasource-dependencies datasource='Parameters'>
+        <column caption='Selected Year' datatype='integer' default-format='n0;-0' name='[Parameter 3167800450805760]' param-domain-type='range' role='measure' type='quantitative' value='2024'>
+          <calculation class='tableau' formula='2024' />
+          <range max='2024' min='1991' />
+        </column>
+        <column caption='Rate Track' datatype='string' name='[Parameter 3167800453713923]' param-domain-type='list' role='measure' type='nominal' value='&quot;Per 100K Total Pop&quot;'>
+          <calculation class='tableau' formula='&quot;Per 100K Total Pop&quot;' />
+        </column>
+      </datasource-dependencies>
+      <object-graph>
+        <objects>
+          <object caption='state_year_aggregate.csv' id='state_year_aggregate.csv_58CFC875D1BC4A6C9C9D417F4A93B064'>
+            <properties context=''>
+              <relation connection='textscan.1d4xjyh0nweo6n12ug2h00ednn39' name='state_year_aggregate.csv' table='[state_year_aggregate#csv]' type='table'>
+                <columns character-set='UTF-8' header='yes' locale='en_IE' separator=','>
+                  <column datatype='date' date-parse-format='yyyy' name='DATA_YEAR' ordinal='0' />
+                  <column datatype='string' name='STATE_NAME' ordinal='1' />
+                  <column datatype='string' name='REGION_NAME' ordinal='2' />
+                  <column datatype='integer' name='INCIDENTS' ordinal='3' />
+                  <column datatype='integer' name='TOTAL_VICTIMS' ordinal='4' />
+                  <column datatype='integer' name='VIOLENT_COUNT' ordinal='5' />
+                  <column datatype='real' name='AVG_SEVERITY' ordinal='6' />
+                  <column datatype='real' name='VIOLENT_PCT' ordinal='7' />
+                  <column datatype='real' name='GINI_COEFFICIENT' ordinal='8' />
+                  <column datatype='integer' name='TOTAL_POPULATION' ordinal='9' />
+                  <column datatype='string' name='LGBT_PCT' ordinal='10' />
+                  <column datatype='string' name='LAW_LEVEL' ordinal='11' />
+                  <column datatype='integer' name='HC_LAW_SO' ordinal='12' />
+                  <column datatype='integer' name='HC_LAW_GI' ordinal='13' />
+                  <column datatype='real' name='RATE_PER_100K_TOTAL' ordinal='14' />
+                  <column datatype='integer' name='LGBT_POPULATION_EST' ordinal='15' />
+                  <column datatype='real' name='RATE_PER_100K_LGBT' ordinal='16' />
+                </columns>
+              </relation>
+            </properties>
+            <properties context='extract'>
+              <relation name='Extract' table='[Extract].[Extract]' type='table' />
+            </properties>
+          </object>
+        </objects>
+      </object-graph>
+    </datasource>
+  </datasources>
+  <mapsources>
+    <mapsource name='Tableau' />
+  </mapsources>
+  <actions>
+    <action caption='Highlight 1 (generated)' name='[Action1_BC88978476394D9EB4B8CDE82D8E2CE2]'>
+      <activation auto-clear='true' type='on-select' />
+      <source type='sheet' worksheet='Subgroup Area' />
+      <command command='tsc:brush'>
+        <param name='field-captions' value='Bias Category' />
+        <param name='target' value='Subgroup Area' />
+      </command>
+    </action>
+    <action caption='Highlight 2 (generated)' name='[Action2_4B1BF6ED298143DBBE220798782BB44E]'>
+      <activation auto-clear='true' type='on-select' />
+      <source dashboard='Dashboard 1' type='sheet' />
+      <command command='tsc:brush'>
+        <param name='field-captions' value='Bias Category' />
+        <param name='target' value='Dashboard 1' />
+      </command>
+    </action>
+  </actions>
+  <worksheets>
+    <worksheet name='Gini Scatter'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontcolor='#000000'>Inequality vs. Victimisation Rate — by Policy Coverage</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='state_year_aggregate' name='federated.170i96e0kiig2e1465cre1gwcxur' />
+            <datasource name='Parameters' />
+          </datasources>
+          <datasource-dependencies datasource='Parameters'>
+            <column caption='Rate Track' datatype='string' name='[Parameter 3167800453713923]' param-domain-type='list' role='measure' type='nominal' value='&quot;Per 100K Total Pop&quot;'>
+              <calculation class='tableau' formula='&quot;Per 100K Total Pop&quot;' />
+            </column>
+          </datasource-dependencies>
+          <datasource-dependencies datasource='federated.170i96e0kiig2e1465cre1gwcxur'>
+            <column caption='[Law Level Label]' datatype='string' name='[Calculation_3167800454250500]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='IF [LAW_LEVEL] = &quot;2&quot; THEN &quot;Full Protection&quot;&#10;ELSEIF [LAW_LEVEL] = &quot;1&quot; THEN &quot;SO Only&quot;&#10;ELSEIF [LAW_LEVEL] = &quot;0&quot; THEN &quot;No Law&quot;&#10;ELSE &quot;Unknown&quot;&#10;END' />
+            </column>
+            <column caption='[Active Rate]' datatype='real' name='[Calculation_3167800454389766]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='IF [Parameters].[Parameter 3167800453713923] = &quot;Per 100K Total Pop&quot;&#10;THEN [RATE_PER_100K_TOTAL]&#10;ELSE [RATE_PER_100K_LGBT]&#10;END' />
+            </column>
+            <column caption='Gini Coefficient' datatype='real' name='[GINI_COEFFICIENT]' role='measure' type='quantitative' />
+            <column caption='Incidents' datatype='integer' name='[INCIDENTS]' role='measure' type='quantitative' />
+            <column caption='Law Level' datatype='string' default-role='measure' default-type='quantitative' name='[LAW_LEVEL]' role='dimension' type='nominal' />
+            <column caption='Rate Per 100K Lgbt' datatype='real' name='[RATE_PER_100K_LGBT]' role='dimension' type='ordinal' />
+            <column caption='Rate Per 100K Total' datatype='real' name='[RATE_PER_100K_TOTAL]' role='measure' type='quantitative' />
+            <column caption='State Name' datatype='string' name='[STATE_NAME]' role='dimension' semantic-role='[State].[Name]' type='nominal' />
+            <column-instance column='[Calculation_3167800454389766]' derivation='Avg' name='[avg:Calculation_3167800454389766:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[GINI_COEFFICIENT]' derivation='Avg' name='[avg:GINI_COEFFICIENT:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_3167800454250500]' derivation='None' name='[none:Calculation_3167800454250500:nk]' pivot='key' type='nominal' />
+            <column-instance column='[STATE_NAME]' derivation='None' name='[none:STATE_NAME:nk]' pivot='key' type='nominal' />
+            <column-instance column='[INCIDENTS]' derivation='Sum' name='[sum:INCIDENTS:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <filter class='quantitative' column='[federated.170i96e0kiig2e1465cre1gwcxur].[avg:Calculation_3167800454389766:qk]' included-values='non-null' />
+          <filter class='quantitative' column='[federated.170i96e0kiig2e1465cre1gwcxur].[avg:GINI_COEFFICIENT:qk]' included-values='non-null' />
+          <slices>
+            <column>[federated.170i96e0kiig2e1465cre1gwcxur].[avg:GINI_COEFFICIENT:qk]</column>
+            <column>[federated.170i96e0kiig2e1465cre1gwcxur].[avg:Calculation_3167800454389766:qk]</column>
+          </slices>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='axis'>
+            <encoding attr='space' class='0' domain-expand='false' field='[federated.170i96e0kiig2e1465cre1gwcxur].[avg:GINI_COEFFICIENT:qk]' field-type='quantitative' scope='cols' type='space' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Circle' />
+            <encodings>
+              <color column='[federated.170i96e0kiig2e1465cre1gwcxur].[none:Calculation_3167800454250500:nk]' />
+              <size column='[federated.170i96e0kiig2e1465cre1gwcxur].[sum:INCIDENTS:qk]' />
+              <text column='[federated.170i96e0kiig2e1465cre1gwcxur].[none:STATE_NAME:nk]' />
+              <lod column='[federated.170i96e0kiig2e1465cre1gwcxur].[none:STATE_NAME:nk]' />
+            </encodings>
+            <trendline enable-confidence-bands='false' enable-instant-analytics='true' enabled='true' exclude-color='false' exclude-intercept='false' fit='linear' />
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.170i96e0kiig2e1465cre1gwcxur].[avg:Calculation_3167800454389766:qk]</rows>
+        <cols>[federated.170i96e0kiig2e1465cre1gwcxur].[avg:GINI_COEFFICIENT:qk]</cols>
+      </table>
+      <simple-id uuid='{7EB631D3-BA04-4D7D-8367-859F81E8090D}' />
+    </worksheet>
+    <worksheet name='National Trend'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontcolor='#000000'>LGBTQI+ Hate Crime Incidents in the US (1991–2024)</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='state_year_aggregate' name='federated.170i96e0kiig2e1465cre1gwcxur' />
+            <datasource name='Parameters' />
+          </datasources>
+          <datasource-dependencies datasource='Parameters'>
+            <column caption='Rate Track' datatype='string' name='[Parameter 3167800453713923]' param-domain-type='list' role='measure' type='nominal' value='&quot;Per 100K Total Pop&quot;'>
+              <calculation class='tableau' formula='&quot;Per 100K Total Pop&quot;' />
+            </column>
+          </datasource-dependencies>
+          <datasource-dependencies datasource='federated.170i96e0kiig2e1465cre1gwcxur'>
+            <column caption='[Active Rate]' datatype='real' name='[Calculation_3167800454389766]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='IF [Parameters].[Parameter 3167800453713923] = &quot;Per 100K Total Pop&quot;&#10;THEN [RATE_PER_100K_TOTAL]&#10;ELSE [RATE_PER_100K_LGBT]&#10;END' />
+            </column>
+            <column caption='[Rate Availability Flag]' datatype='string' name='[Calculation_3167800454860808]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='IF [Parameters].[Parameter 3167800453713923] = &quot;Track 2 — Per 100K LGBT Pop (2012+)&quot;&#10;   AND YEAR([DATA_YEAR]) &lt; 2012&#10;THEN &quot;⚠ No LGBT pop data pre-2012&quot;&#10;ELSE &quot;&quot;&#10;END' />
+            </column>
+            <column caption='Data Year' datatype='date' name='[DATA_YEAR]' role='dimension' type='quantitative' />
+            <column caption='Incidents' datatype='integer' name='[INCIDENTS]' role='measure' type='quantitative' />
+            <column caption='Rate Per 100K Lgbt' datatype='real' name='[RATE_PER_100K_LGBT]' role='dimension' type='ordinal' />
+            <column caption='Rate Per 100K Total' datatype='real' name='[RATE_PER_100K_TOTAL]' role='measure' type='quantitative' />
+            <column caption='State Name' datatype='string' name='[STATE_NAME]' role='dimension' semantic-role='[State].[Name]' type='nominal' />
+            <column-instance column='[Calculation_3167800454389766]' derivation='Avg' name='[avg:Calculation_3167800454389766:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_3167800454860808]' derivation='None' name='[none:Calculation_3167800454860808:nk]' pivot='key' type='nominal' />
+            <column-instance column='[INCIDENTS]' derivation='Sum' name='[sum:INCIDENTS:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[DATA_YEAR]' derivation='Year-Trunc' name='[tyr:DATA_YEAR:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <filter class='categorical' column='[federated.170i96e0kiig2e1465cre1gwcxur].[Action (State Name)]'>
+            <groupfilter function='level-members' level='[STATE_NAME]' user:ui-action-filter='[Action2_CC5FC9A4E164416B975B4B55CEFB801E]' user:ui-enumeration='all' user:ui-marker='enumerate' />
+          </filter>
+          <slices>
+            <column>[federated.170i96e0kiig2e1465cre1gwcxur].[Action (State Name)]</column>
+          </slices>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='axis'>
+            <encoding attr='space' class='0' field='[federated.170i96e0kiig2e1465cre1gwcxur].[avg:Calculation_3167800454389766:qk]' field-type='quantitative' fold='true' scope='rows' type='space' />
+            <format attr='title' class='0' field='[federated.170i96e0kiig2e1465cre1gwcxur].[avg:Calculation_3167800454389766:qk]' scope='rows' value='Rate per 100K' />
+            <format attr='title' class='0' field='[federated.170i96e0kiig2e1465cre1gwcxur].[sum:INCIDENTS:qk]' scope='rows' value='Incident Count' />
+          </style-rule>
+          <style-rule element='refline'>
+            <format attr='fill-above' id='refline0' value='#00000000' />
+            <format attr='fill-below' id='refline0' value='#00000000' />
+            <format attr='line-visibility' id='refline0' value='on' />
+            <format attr='line-pattern-only' id='refline0' value='dotted' />
+            <format attr='stroke-color' id='refline0' value='#a7acad4b' />
+            <format attr='fill-above' id='refline3' value='#00000000' />
+            <format attr='fill-below' id='refline3' value='#00000000' />
+            <format attr='line-visibility' id='refline3' value='on' />
+            <format attr='line-pattern-only' id='refline3' value='dotted' />
+            <format attr='stroke-color' id='refline3' value='#a7acad4b' />
+            <format attr='fill-above' id='refline6' value='#00000000' />
+            <format attr='fill-below' id='refline6' value='#00000000' />
+            <format attr='line-visibility' id='refline6' value='on' />
+            <format attr='line-pattern-only' id='refline6' value='dotted' />
+            <format attr='stroke-color' id='refline6' value='#a7acad4b' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane id='1' selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <mark-sizing custom-mark-size-in-axis-units='1.0' mark-alignment='mark-alignment-left' mark-sizing-setting='marks-scaling-on' use-custom-mark-size='false' />
+            <encodings>
+              <color column='[federated.170i96e0kiig2e1465cre1gwcxur].[:Measure Names]' />
+            </encodings>
+            <reference-line axis-column='[federated.170i96e0kiig2e1465cre1gwcxur].[tyr:DATA_YEAR:qk]' enable-instant-analytics='true' formula='constant' id='refline0' label='Obergefell' label-type='custom' scope='per-pane' value='#2015-01-01 00:00:00#' value-column='[federated.170i96e0kiig2e1465cre1gwcxur].[tyr:DATA_YEAR:qk]' z-order='1' />
+            <reference-line axis-column='[federated.170i96e0kiig2e1465cre1gwcxur].[tyr:DATA_YEAR:qk]' enable-instant-analytics='true' formula='constant' id='refline3' label='Pulse Nightclub' label-type='custom' scope='per-pane' value='#2016-01-01 00:00:00#' value-column='[federated.170i96e0kiig2e1465cre1gwcxur].[tyr:DATA_YEAR:qk]' z-order='2' />
+            <reference-line axis-column='[federated.170i96e0kiig2e1465cre1gwcxur].[tyr:DATA_YEAR:qk]' enable-instant-analytics='true' formula='constant' id='refline6' label='COVID-19' label-type='custom' scope='per-pane' value='#2020-01-01 00:00:00#' value-column='[federated.170i96e0kiig2e1465cre1gwcxur].[tyr:DATA_YEAR:qk]' z-order='3' />
+          </pane>
+          <pane id='2' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.170i96e0kiig2e1465cre1gwcxur].[avg:Calculation_3167800454389766:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.170i96e0kiig2e1465cre1gwcxur].[:Measure Names]' />
+              <lod column='[federated.170i96e0kiig2e1465cre1gwcxur].[none:Calculation_3167800454860808:nk]' />
+            </encodings>
+            <customized-tooltip>
+              <formatted-text>
+                <run fontcolor='#000000' fontname='Benton Sans Book'><![CDATA[Year: <[federated.170i96e0kiig2e1465cre1gwcxur].[tyr:DATA_YEAR:qk]>]]></run>
+                <run>Æ&#10;</run>
+                <run fontcolor='#000000' fontname='Benton Sans Book'><![CDATA[Incidents: <[federated.170i96e0kiig2e1465cre1gwcxur].[sum:INCIDENTS:qk]>]]></run>
+                <run>Æ&#10;</run>
+                <run fontcolor='#000000' fontname='Benton Sans Book'>&lt;Active Rate (AVG)&gt; per 100K</run>
+                <run>Æ&#10;</run>
+                <run fontcolor='#000000' fontname='Benton Sans Book'>YoY Change: &lt;[YoY Change]&gt;</run>
+              </formatted-text>
+            </customized-tooltip>
+          </pane>
+          <pane id='3' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.170i96e0kiig2e1465cre1gwcxur].[sum:INCIDENTS:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <mark-sizing custom-mark-size-in-axis-units='1.0' mark-alignment='mark-alignment-left' mark-sizing-setting='marks-scaling-on' use-custom-mark-size='false' />
+            <encodings>
+              <color column='[federated.170i96e0kiig2e1465cre1gwcxur].[:Measure Names]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>([federated.170i96e0kiig2e1465cre1gwcxur].[sum:INCIDENTS:qk] + [federated.170i96e0kiig2e1465cre1gwcxur].[avg:Calculation_3167800454389766:qk])</rows>
+        <cols>[federated.170i96e0kiig2e1465cre1gwcxur].[tyr:DATA_YEAR:qk]</cols>
+      </table>
+      <simple-id uuid='{2BC307C5-4047-4DB5-A090-B98163C758C4}' />
+    </worksheet>
+    <worksheet name='Policy Box Plots'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontcolor='#000000'>Victimisation Rate by Hate Crime Law Coverage</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='state_year_aggregate' name='federated.170i96e0kiig2e1465cre1gwcxur' />
+            <datasource name='Parameters' />
+          </datasources>
+          <datasource-dependencies datasource='Parameters'>
+            <column caption='Rate Track' datatype='string' name='[Parameter 3167800453713923]' param-domain-type='list' role='measure' type='nominal' value='&quot;Per 100K Total Pop&quot;'>
+              <calculation class='tableau' formula='&quot;Per 100K Total Pop&quot;' />
+            </column>
+          </datasource-dependencies>
+          <datasource-dependencies datasource='federated.170i96e0kiig2e1465cre1gwcxur'>
+            <column caption='[Law Level Label]' datatype='string' name='[Calculation_3167800454250500]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='IF [LAW_LEVEL] = &quot;2&quot; THEN &quot;Full Protection&quot;&#10;ELSEIF [LAW_LEVEL] = &quot;1&quot; THEN &quot;SO Only&quot;&#10;ELSEIF [LAW_LEVEL] = &quot;0&quot; THEN &quot;No Law&quot;&#10;ELSE &quot;Unknown&quot;&#10;END' />
+            </column>
+            <column caption='[Law Level Order]' datatype='integer' name='[Calculation_3167800454344709]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='IF [LAW_LEVEL] = &quot;0&quot; THEN 1&#10;ELSEIF [LAW_LEVEL] = &quot;1&quot; THEN 2&#10;ELSEIF [LAW_LEVEL] = &quot;2&quot; THEN 3&#10;ELSE 4&#10;END' />
+            </column>
+            <column caption='[Active Rate]' datatype='real' name='[Calculation_3167800454389766]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='IF [Parameters].[Parameter 3167800453713923] = &quot;Per 100K Total Pop&quot;&#10;THEN [RATE_PER_100K_TOTAL]&#10;ELSE [RATE_PER_100K_LGBT]&#10;END' />
+            </column>
+            <column caption='Law Level' datatype='string' default-role='measure' default-type='quantitative' name='[LAW_LEVEL]' role='dimension' type='nominal' />
+            <column caption='Rate Per 100K Lgbt' datatype='real' name='[RATE_PER_100K_LGBT]' role='dimension' type='ordinal' />
+            <column caption='Rate Per 100K Total' datatype='real' name='[RATE_PER_100K_TOTAL]' role='measure' type='quantitative' />
+            <column-instance column='[Calculation_3167800454389766]' derivation='Avg' name='[avg:Calculation_3167800454389766:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_3167800454344709]' derivation='Min' name='[min:Calculation_3167800454344709:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_3167800454250500]' derivation='None' name='[none:Calculation_3167800454250500:nk]' pivot='key' type='nominal' />
+          </datasource-dependencies>
+          <filter class='categorical' column='[federated.170i96e0kiig2e1465cre1gwcxur].[none:Calculation_3167800454250500:nk]'>
+            <groupfilter function='union' user:ui-domain='database' user:ui-enumeration='inclusive' user:ui-marker='enumerate'>
+              <groupfilter function='member' level='[none:Calculation_3167800454250500:nk]' member='&quot;Full Protection&quot;' />
+              <groupfilter function='member' level='[none:Calculation_3167800454250500:nk]' member='&quot;No Law&quot;' />
+              <groupfilter function='member' level='[none:Calculation_3167800454250500:nk]' member='&quot;SO Only&quot;' />
+            </groupfilter>
+          </filter>
+          <computed-sort column='[federated.170i96e0kiig2e1465cre1gwcxur].[none:Calculation_3167800454250500:nk]' direction='ASC' using='[federated.170i96e0kiig2e1465cre1gwcxur].[min:Calculation_3167800454344709:qk]' />
+          <slices>
+            <column>[federated.170i96e0kiig2e1465cre1gwcxur].[none:Calculation_3167800454250500:nk]</column>
+          </slices>
+          <aggregation value='false' />
+        </view>
+        <style>
+          <style-rule element='axis'>
+            <encoding attr='space' class='0' field='[federated.170i96e0kiig2e1465cre1gwcxur].[avg:Calculation_3167800454389766:qk]' field-type='quantitative' max='4.0' min='0.0' range-type='fixed' scope='rows' type='space' />
+            <format attr='title' class='0' field='[federated.170i96e0kiig2e1465cre1gwcxur].[avg:Calculation_3167800454389766:qk]' scope='rows' value='Incidents per 100k population' />
+          </style-rule>
+          <style-rule element='cell'>
+            <format attr='width' field='[federated.170i96e0kiig2e1465cre1gwcxur].[none:Calculation_3167800454250500:nk]' value='72' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Circle' />
+            <mark-sizing mark-sizing-setting='marks-scaling-off' />
+            <encodings>
+              <color column='[federated.170i96e0kiig2e1465cre1gwcxur].[none:Calculation_3167800454250500:nk]' />
+            </encodings>
+            <reference-line axis-column='[federated.170i96e0kiig2e1465cre1gwcxur].[avg:Calculation_3167800454389766:qk]' boxplot-mark-exclusion='true' boxplot-whisker-type='standard' enable-instant-analytics='true' formula='average' id='refline0' label-type='none' probability='95' scope='per-cell' symmetric='false' value-column='[federated.170i96e0kiig2e1465cre1gwcxur].[avg:Calculation_3167800454389766:qk]' z-order='1' />
+            <customized-tooltip>
+              <formatted-text>
+                <run bold='true' fontcolor='#ff0000'>Law Coverage: &lt;Law Level Label&gt;</run>
+                <run>Æ&#10;</run>
+                <run bold='true' fontcolor='#ff0000'>Avg Rate: &lt;AVG(Active Rate)&gt;</run>
+                <run>Æ&#10;</run>
+                <run bold='true' fontcolor='#ff0000'>State: &lt;State Name&gt;</run>
+                <run>Æ&#10;</run>
+                <run bold='true' fontcolor='#ff0000'>Year: &lt;YEAR(Data Year)&gt;</run>
+              </formatted-text>
+            </customized-tooltip>
+            <style>
+              <style-rule element='mark'>
+                <format attr='size' value='0.14193369448184967' />
+              </style-rule>
+              <style-rule element='pane'>
+                <format attr='minwidth' value='-1' />
+                <format attr='maxwidth' value='-1' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.170i96e0kiig2e1465cre1gwcxur].[avg:Calculation_3167800454389766:qk]</rows>
+        <cols>[federated.170i96e0kiig2e1465cre1gwcxur].[none:Calculation_3167800454250500:nk]</cols>
+        <annotations>
+          <annotation class='area' id='0' text-pinx='0.5' text-piny='0.5' text-width-delta='-18'>
+            <formatted-text>
+              <run fontalignment='0' fontcolor='#000000' fontname='Benton Sans Book'>States with full protection laws report higher rates — a well-documented </run>
+              <run bold='true' fontalignment='0' fontcolor='#000000' fontname='Benton Sans Book'>reporting effect</run>
+              <run fontalignment='0' fontcolor='#000000' fontname='Benton Sans Book'>: legal frameworks improve incident classification, surfacing crimes previously recorded as generic assault.</run>
+            </formatted-text>
+            <top-left>
+              <visual-coordinate class='axis'>
+                <x-coord cell-offset='0.0694444'>
+                  <node-reference>
+                    <fields>
+                      <field>[federated.170i96e0kiig2e1465cre1gwcxur].[none:Calculation_3167800454250500:nk]</field>
+                    </fields>
+                    <multibucket>
+                      <bucket>&quot;No Law&quot;</bucket>
+                    </multibucket>
+                  </node-reference>
+                </x-coord>
+                <y-coord axis-value='15.89590471780029'>
+                  <node-reference>
+                    <axis>[federated.170i96e0kiig2e1465cre1gwcxur].[avg:Calculation_3167800454389766:qk]</axis>
+                  </node-reference>
+                </y-coord>
+                <page-reference />
+              </visual-coordinate>
+            </top-left>
+            <bottom-right>
+              <visual-coordinate class='axis'>
+                <x-coord cell-offset='0.0138889'>
+                  <node-reference>
+                    <fields>
+                      <field>[federated.170i96e0kiig2e1465cre1gwcxur].[none:Calculation_3167800454250500:nk]</field>
+                    </fields>
+                    <multibucket>
+                      <bucket>&quot;Full Protection&quot;</bucket>
+                    </multibucket>
+                  </node-reference>
+                </x-coord>
+                <y-coord axis-value='13.657688248914617'>
+                  <node-reference>
+                    <axis>[federated.170i96e0kiig2e1465cre1gwcxur].[avg:Calculation_3167800454389766:qk]</axis>
+                  </node-reference>
+                </y-coord>
+                <page-reference />
+              </visual-coordinate>
+            </bottom-right>
+            <text x='0.5' y='0.5' />
+          </annotation>
+        </annotations>
+      </table>
+      <simple-id uuid='{7854D156-EB9E-4A4F-B82A-7C2CADE69385}' />
+    </worksheet>
+    <worksheet name='Seasonality Heatmap'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontcolor='#000000'>Seasonality of Incidents — Violent vs. Non-Violent</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='lgbtq_hate_crimes_full.csv (Multiple Connections)' name='federated.10uuaf50uqhub21fxlf381yana8c' />
+          </datasources>
+          <datasource-dependencies datasource='federated.10uuaf50uqhub21fxlf381yana8c'>
+            <column caption='[Is Violent Label]' datatype='string' name='[Calculation_3167800455938060]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='IF [IS_VIOLENT] = 1 THEN &quot;Violent&quot; ELSE &quot;Non-Violent&quot; END' />
+            </column>
+            <column caption='Is Violent' datatype='integer' name='[IS_VIOLENT]' role='measure' type='quantitative' />
+            <column caption='Month' datatype='integer' name='[MONTH]' role='dimension' type='quantitative' />
+            <column caption='Month Name' datatype='string' name='[MONTH_NAME]' role='dimension' type='nominal' />
+            <column-instance column='[__tableau_internal_object_id__].[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]' derivation='Count' name='[__tableau_internal_object_id__].[cnt:lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207:qk]' pivot='key' type='quantitative' />
+            <column caption='lgbtq_hate_crimes_full.csv' datatype='table' name='[__tableau_internal_object_id__].[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]' role='measure' type='quantitative' />
+            <column-instance column='[MONTH]' derivation='Min' name='[min:MONTH:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_3167800455938060]' derivation='None' name='[none:Calculation_3167800455938060:nk]' pivot='key' type='nominal' />
+            <column-instance column='[MONTH_NAME]' derivation='None' name='[none:MONTH_NAME:nk]' pivot='key' type='nominal' />
+          </datasource-dependencies>
+          <computed-sort column='[federated.10uuaf50uqhub21fxlf381yana8c].[none:MONTH_NAME:nk]' direction='ASC' using='[federated.10uuaf50uqhub21fxlf381yana8c].[min:MONTH:qk]' />
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.10uuaf50uqhub21fxlf381yana8c].[__tableau_internal_object_id__].[cnt:lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207:qk]' type='custom-interpolated'>
+              <color-palette custom='true' name='' type='ordered-sequential'>
+                <color>#f1f1f1</color>
+                <color>#d7e0ec</color>
+                <color>#bed1e7</color>
+                <color>#a5c2e2</color>
+                <color>#8eb3dd</color>
+                <color>#78a5d8</color>
+                <color>#6297d3</color>
+                <color>#4d8ace</color>
+                <color>#3a7dc9</color>
+                <color>#2770c4</color>
+                <color>#1565c0</color>
+              </color-palette>
+            </encoding>
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Square' />
+            <encodings>
+              <color column='[federated.10uuaf50uqhub21fxlf381yana8c].[__tableau_internal_object_id__].[cnt:lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207:qk]' />
+              <text column='[federated.10uuaf50uqhub21fxlf381yana8c].[__tableau_internal_object_id__].[cnt:lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-cull' value='true' />
+                <format attr='mark-labels-show' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.10uuaf50uqhub21fxlf381yana8c].[none:MONTH_NAME:nk]</rows>
+        <cols>[federated.10uuaf50uqhub21fxlf381yana8c].[none:Calculation_3167800455938060:nk]</cols>
+      </table>
+      <simple-id uuid='{BBA06B81-CA39-4747-BEB9-4672878DA979}' />
+    </worksheet>
+    <worksheet name='State Map'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontcolor='#000000'>State Incident Rate in &lt;</run>
+            <run fontcolor='#000000'>[Parameters].[Parameter 3167800450805760]</run>
+            <run fontcolor='#000000'>&gt;</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='state_year_aggregate' name='federated.170i96e0kiig2e1465cre1gwcxur' />
+            <datasource name='Parameters' />
+          </datasources>
+          <mapsources>
+            <mapsource name='Tableau' />
+          </mapsources>
+          <datasource-dependencies datasource='Parameters'>
+            <column caption='Selected Year' datatype='integer' default-format='n0;-0' name='[Parameter 3167800450805760]' param-domain-type='range' role='measure' type='quantitative' value='2024'>
+              <calculation class='tableau' formula='2024' />
+              <range max='2024' min='1991' />
+            </column>
+            <column caption='Rate Track' datatype='string' name='[Parameter 3167800453713923]' param-domain-type='list' role='measure' type='nominal' value='&quot;Per 100K Total Pop&quot;'>
+              <calculation class='tableau' formula='&quot;Per 100K Total Pop&quot;' />
+            </column>
+          </datasource-dependencies>
+          <datasource-dependencies datasource='federated.170i96e0kiig2e1465cre1gwcxur'>
+            <column caption='[Law Level Label]' datatype='string' name='[Calculation_3167800454250500]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='IF [LAW_LEVEL] = &quot;2&quot; THEN &quot;Full Protection&quot;&#10;ELSEIF [LAW_LEVEL] = &quot;1&quot; THEN &quot;SO Only&quot;&#10;ELSEIF [LAW_LEVEL] = &quot;0&quot; THEN &quot;No Law&quot;&#10;ELSE &quot;Unknown&quot;&#10;END' />
+            </column>
+            <column caption='[Active Rate]' datatype='real' name='[Calculation_3167800454389766]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='IF [Parameters].[Parameter 3167800453713923] = &quot;Per 100K Total Pop&quot;&#10;THEN [RATE_PER_100K_TOTAL]&#10;ELSE [RATE_PER_100K_LGBT]&#10;END' />
+            </column>
+            <column caption='[In Selected Year]' datatype='boolean' name='[Calculation_3167800454901769]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='YEAR([DATA_YEAR]) = [Parameters].[Parameter 3167800450805760]' />
+            </column>
+            <column caption='Data Year' datatype='date' name='[DATA_YEAR]' role='dimension' type='quantitative' />
+            <column caption='Gini Coefficient' datatype='real' name='[GINI_COEFFICIENT]' role='measure' type='quantitative' />
+            <column caption='Incidents' datatype='integer' name='[INCIDENTS]' role='measure' type='quantitative' />
+            <column caption='Law Level' datatype='string' default-role='measure' default-type='quantitative' name='[LAW_LEVEL]' role='dimension' type='nominal' />
+            <column caption='Rate Per 100K Lgbt' datatype='real' name='[RATE_PER_100K_LGBT]' role='dimension' type='ordinal' />
+            <column caption='Rate Per 100K Total' datatype='real' name='[RATE_PER_100K_TOTAL]' role='measure' type='quantitative' />
+            <column caption='State Name' datatype='string' name='[STATE_NAME]' role='dimension' semantic-role='[State].[Name]' type='nominal' />
+            <column-instance column='[GINI_COEFFICIENT]' derivation='Avg' name='[avg:GINI_COEFFICIENT:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_3167800454250500]' derivation='None' name='[none:Calculation_3167800454250500:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_3167800454901769]' derivation='None' name='[none:Calculation_3167800454901769:nk]' pivot='key' type='nominal' />
+            <column-instance column='[STATE_NAME]' derivation='None' name='[none:STATE_NAME:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_3167800454389766]' derivation='Sum' name='[sum:Calculation_3167800454389766:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[INCIDENTS]' derivation='Sum' name='[sum:INCIDENTS:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <filter class='categorical' column='[federated.170i96e0kiig2e1465cre1gwcxur].[none:Calculation_3167800454901769:nk]'>
+            <groupfilter function='member' level='[none:Calculation_3167800454901769:nk]' member='true' user:ui-domain='database' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
+          </filter>
+          <slices>
+            <column>[federated.170i96e0kiig2e1465cre1gwcxur].[none:Calculation_3167800454901769:nk]</column>
+          </slices>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='axis'>
+            <encoding attr='space' class='0' field='[federated.170i96e0kiig2e1465cre1gwcxur].[Longitude (generated)]' field-type='quantitative' max='36207887.749774218' min='23866892.139348269' projection='EPSG:3857' range-type='fixed' scope='cols' type='space' />
+            <encoding attr='space' class='0' field='[federated.170i96e0kiig2e1465cre1gwcxur].[Latitude (generated)]' field-type='quantitative' max='7354010.4324335549' min='3406175.5136178164' projection='EPSG:3857' range-type='fixed' scope='rows' type='space' />
+          </style-rule>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.170i96e0kiig2e1465cre1gwcxur].[sum:Calculation_3167800454389766:qk]' max='1.5' num-steps='5' palette='blue_10_0' type='interpolated' />
+          </style-rule>
+          <style-rule element='map'>
+            <format attr='washout' value='0.0' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Circle' />
+            <encodings>
+              <color column='[federated.170i96e0kiig2e1465cre1gwcxur].[sum:Calculation_3167800454389766:qk]' />
+              <size column='[federated.170i96e0kiig2e1465cre1gwcxur].[sum:INCIDENTS:qk]' />
+              <lod column='[federated.170i96e0kiig2e1465cre1gwcxur].[none:STATE_NAME:nk]' />
+              <lod column='[federated.170i96e0kiig2e1465cre1gwcxur].[none:Calculation_3167800454250500:nk]' />
+              <lod column='[federated.170i96e0kiig2e1465cre1gwcxur].[avg:GINI_COEFFICIENT:qk]' />
+            </encodings>
+            <customized-tooltip>
+              <formatted-text>
+                <run bold='true' fontcolor='#000000'><![CDATA[<[federated.170i96e0kiig2e1465cre1gwcxur].[none:STATE_NAME:nk]>]]></run>
+                <run>Æ&#10;</run>
+                <run bold='true' fontcolor='#000000'><![CDATA[Year: <[Parameters].[Parameter 3167800450805760]>]]></run>
+                <run>Æ&#10;</run>
+                <run bold='true' fontcolor='#000000'><![CDATA[Rate per 100k: <[federated.170i96e0kiig2e1465cre1gwcxur].[sum:Calculation_3167800454389766:qk]>]]></run>
+                <run>Æ&#10;</run>
+                <run bold='true' fontcolor='#000000'><![CDATA[Incidents: <[federated.170i96e0kiig2e1465cre1gwcxur].[sum:INCIDENTS:qk]>]]></run>
+                <run>Æ&#10;</run>
+                <run bold='true' fontcolor='#000000'><![CDATA[Law coverage: <[federated.170i96e0kiig2e1465cre1gwcxur].[none:Calculation_3167800454250500:nk]>]]></run>
+                <run>Æ&#10;</run>
+                <run bold='true' fontcolor='#000000'><![CDATA[Gini coefficient: <[federated.170i96e0kiig2e1465cre1gwcxur].[avg:GINI_COEFFICIENT:qk]>]]></run>
+              </formatted-text>
+            </customized-tooltip>
+          </pane>
+        </panes>
+        <rows>[federated.170i96e0kiig2e1465cre1gwcxur].[Latitude (generated)]</rows>
+        <cols>[federated.170i96e0kiig2e1465cre1gwcxur].[Longitude (generated)]</cols>
+      </table>
+      <simple-id uuid='{6F2D7DDC-18D5-4364-AF36-25B75EF64FD8}' />
+    </worksheet>
+    <worksheet name='Subgroup Area'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontcolor='#000000'>Incident Mix by Bias Subgroup (1991–2024)</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='lgbtq_hate_crimes_full.csv (Multiple Connections)' name='federated.10uuaf50uqhub21fxlf381yana8c' />
+          </datasources>
+          <datasource-dependencies datasource='federated.10uuaf50uqhub21fxlf381yana8c'>
+            <column caption='Bias Category' datatype='string' name='[BIAS_CATEGORY]' role='dimension' type='nominal' />
+            <column caption='Incident Id' datatype='integer' name='[INCIDENT_ID]' role='dimension' type='ordinal' />
+            <column caption='Year' datatype='date' name='[YEAR]' role='dimension' type='quantitative' />
+            <column-instance column='[INCIDENT_ID]' derivation='Count' name='[cnt:INCIDENT_ID:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[BIAS_CATEGORY]' derivation='None' name='[none:BIAS_CATEGORY:nk]' pivot='key' type='nominal' />
+            <column-instance column='[YEAR]' derivation='Year-Trunc' name='[tyr:YEAR:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <filter class='categorical' column='[federated.10uuaf50uqhub21fxlf381yana8c].[none:BIAS_CATEGORY:nk]'>
+            <groupfilter function='union' user:ui-domain='database' user:ui-enumeration='inclusive' user:ui-marker='enumerate'>
+              <groupfilter function='member' level='[none:BIAS_CATEGORY:nk]' member='&quot;Anti-Bisexual&quot;' />
+              <groupfilter function='member' level='[none:BIAS_CATEGORY:nk]' member='&quot;Anti-Gay (Male)&quot;' />
+              <groupfilter function='member' level='[none:BIAS_CATEGORY:nk]' member='&quot;Anti-Gender Non-Conforming&quot;' />
+              <groupfilter function='member' level='[none:BIAS_CATEGORY:nk]' member='&quot;Anti-Lesbian&quot;' />
+              <groupfilter function='member' level='[none:BIAS_CATEGORY:nk]' member='&quot;Anti-LGBTQ (General)&quot;' />
+              <groupfilter function='member' level='[none:BIAS_CATEGORY:nk]' member='&quot;Anti-Transgender&quot;' />
+            </groupfilter>
+          </filter>
+          <slices>
+            <column>[federated.10uuaf50uqhub21fxlf381yana8c].[none:BIAS_CATEGORY:nk]</column>
+          </slices>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='axis'>
+            <format attr='title' class='0' field='[federated.10uuaf50uqhub21fxlf381yana8c].[tyr:YEAR:qk]' scope='cols' value='Year' />
+            <encoding attr='space' class='0' field='[federated.10uuaf50uqhub21fxlf381yana8c].[tyr:YEAR:qk]' field-type='quantitative' major-origin='#1991-12-30 00:00:00#' major-spacing='4.0' major-units='years' scope='cols' type='space' />
+          </style-rule>
+          <style-rule element='label'>
+            <format attr='text-format' field='[federated.10uuaf50uqhub21fxlf381yana8c].[cnt:INCIDENT_ID:qk]' value='n#,##0,K;-#,##0,K' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Area' />
+            <encodings>
+              <color column='[federated.10uuaf50uqhub21fxlf381yana8c].[none:BIAS_CATEGORY:nk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.10uuaf50uqhub21fxlf381yana8c].[cnt:INCIDENT_ID:qk]</rows>
+        <cols>[federated.10uuaf50uqhub21fxlf381yana8c].[tyr:YEAR:qk]</cols>
+        <annotations>
+          <annotation class='area' id='1' text-pinx='0.5' text-piny='0.5' text-width-delta='-18'>
+            <formatted-text>
+              <run fontalignment='0' fontcolor='#000000' fontname='Benton Sans Book'>*Anti-Transgender incidents not tracked separately before 2013. Growth 2013–2024: +557%.</run>
+            </formatted-text>
+            <top-left>
+              <visual-coordinate class='axis'>
+                <x-coord axis-value='#1989-08-15 18:08:54.433#'>
+                  <node-reference>
+                    <axis>[federated.10uuaf50uqhub21fxlf381yana8c].[tyr:YEAR:qk]</axis>
+                  </node-reference>
+                </x-coord>
+                <y-coord axis-value='2889.3921568627452'>
+                  <node-reference>
+                    <axis>[federated.10uuaf50uqhub21fxlf381yana8c].[cnt:INCIDENT_ID:qk]</axis>
+                  </node-reference>
+                </y-coord>
+                <page-reference />
+              </visual-coordinate>
+            </top-left>
+            <bottom-right>
+              <visual-coordinate class='axis'>
+                <x-coord axis-value='#2000-07-05 00:05:11.752#'>
+                  <node-reference>
+                    <axis>[federated.10uuaf50uqhub21fxlf381yana8c].[tyr:YEAR:qk]</axis>
+                  </node-reference>
+                </x-coord>
+                <y-coord axis-value='2697.3109243697481'>
+                  <node-reference>
+                    <axis>[federated.10uuaf50uqhub21fxlf381yana8c].[cnt:INCIDENT_ID:qk]</axis>
+                  </node-reference>
+                </y-coord>
+                <page-reference />
+              </visual-coordinate>
+            </bottom-right>
+            <text x='0.5' y='0.5' />
+          </annotation>
+        </annotations>
+      </table>
+      <simple-id uuid='{2D0F55A5-33F0-457C-8751-B0928432A150}' />
+    </worksheet>
+    <worksheet name='Tile A — Total Incidents'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontcolor='#ffffff' fontname='Benton Sans Book' fontsize='11'>Total Incidents Recorded</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='state_year_aggregate' name='federated.170i96e0kiig2e1465cre1gwcxur' />
+          </datasources>
+          <datasource-dependencies datasource='federated.170i96e0kiig2e1465cre1gwcxur'>
+            <column caption='Incidents' datatype='integer' name='[INCIDENTS]' role='measure' type='quantitative' />
+            <column-instance column='[INCIDENTS]' derivation='Sum' name='[sum:INCIDENTS:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='cell'>
+            <format attr='text-format' field='[federated.170i96e0kiig2e1465cre1gwcxur].[sum:INCIDENTS:qk]' value='n#,##0;-#,##0' />
+            <format attr='font-size' field='[federated.170i96e0kiig2e1465cre1gwcxur].[sum:INCIDENTS:qk]' value='28' />
+          </style-rule>
+          <style-rule element='table'>
+            <format attr='background-color' value='#1565c0' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane id='2' selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Text' />
+            <encodings>
+              <text column='[federated.170i96e0kiig2e1465cre1gwcxur].[sum:INCIDENTS:qk]' />
+            </encodings>
+            <customized-label>
+              <formatted-text>
+                <run fontcolor='#ffffff' fontsize='28'>&lt;</run>
+                <run fontcolor='#ffffff' fontsize='28'>[federated.170i96e0kiig2e1465cre1gwcxur].[sum:INCIDENTS:qk]</run>
+                <run fontcolor='#ffffff' fontsize='28'>&gt;</run>
+              </formatted-text>
+            </customized-label>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows />
+        <cols />
+      </table>
+      <simple-id uuid='{2176ED03-0848-4A8F-9937-A2351A284DCB}' />
+    </worksheet>
+    <worksheet name='Tile B — Pct Violent'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontcolor='#ffffff' fontsize='11'>Incidents Involving Violence</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='state_year_aggregate' name='federated.170i96e0kiig2e1465cre1gwcxur' />
+          </datasources>
+          <datasource-dependencies datasource='federated.170i96e0kiig2e1465cre1gwcxur'>
+            <column caption='[Violent Share]' datatype='real' name='[Calculation_3167800464904209]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='SUM([VIOLENT_COUNT]) / SUM([INCIDENTS])' />
+            </column>
+            <column caption='Incidents' datatype='integer' name='[INCIDENTS]' role='measure' type='quantitative' />
+            <column caption='Violent Count' datatype='integer' name='[VIOLENT_COUNT]' role='measure' type='quantitative' />
+            <column-instance column='[Calculation_3167800464904209]' derivation='User' name='[usr:Calculation_3167800464904209:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='cell'>
+            <format attr='text-format' field='[federated.170i96e0kiig2e1465cre1gwcxur].[usr:Calculation_3167800464904209:qk]' value='p0.0%' />
+          </style-rule>
+          <style-rule element='table'>
+            <format attr='background-color' value='#b71c1c' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Text' />
+            <encodings>
+              <text column='[federated.170i96e0kiig2e1465cre1gwcxur].[usr:Calculation_3167800464904209:qk]' />
+            </encodings>
+            <customized-label>
+              <formatted-text>
+                <run fontcolor='#ffffff' fontsize='28'>&lt;</run>
+                <run fontcolor='#ffffff' fontsize='28'>[federated.170i96e0kiig2e1465cre1gwcxur].[usr:Calculation_3167800464904209:qk]</run>
+                <run fontcolor='#ffffff' fontsize='28'>&gt;</run>
+              </formatted-text>
+            </customized-label>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows />
+        <cols />
+      </table>
+      <simple-id uuid='{82291470-A3D9-419D-805A-5B1D3BD31614}' />
+    </worksheet>
+    <worksheet name='Tile C — States With Law'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontcolor='#ffffff' fontsize='11'>States with Hate Crime Law</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='state_year_aggregate' name='federated.170i96e0kiig2e1465cre1gwcxur' />
+            <datasource name='Parameters' />
+          </datasources>
+          <datasource-dependencies datasource='Parameters'>
+            <column caption='Selected Year' datatype='integer' default-format='n0;-0' name='[Parameter 3167800450805760]' param-domain-type='range' role='measure' type='quantitative' value='2024'>
+              <calculation class='tableau' formula='2024' />
+              <range max='2024' min='1991' />
+            </column>
+          </datasource-dependencies>
+          <datasource-dependencies datasource='federated.170i96e0kiig2e1465cre1gwcxur'>
+            <column caption='[In Selected Year]' datatype='boolean' name='[Calculation_3167800454901769]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='YEAR([DATA_YEAR]) = [Parameters].[Parameter 3167800450805760]' />
+            </column>
+            <column caption='[States With Law]' datatype='integer' name='[Calculation_3167800467066898]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='COUNTD(IF [LAW_LEVEL] &lt;&gt; &quot;0&quot; AND [LAW_LEVEL] &lt;&gt; &quot;NA&quot; THEN [STATE_NAME] END)' />
+            </column>
+            <column caption='Data Year' datatype='date' name='[DATA_YEAR]' role='dimension' type='quantitative' />
+            <column caption='Law Level' datatype='string' default-role='measure' default-type='quantitative' name='[LAW_LEVEL]' role='dimension' type='nominal' />
+            <column caption='State Name' datatype='string' name='[STATE_NAME]' role='dimension' semantic-role='[State].[Name]' type='nominal' />
+            <column-instance column='[Calculation_3167800454901769]' derivation='None' name='[none:Calculation_3167800454901769:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_3167800467066898]' derivation='User' name='[usr:Calculation_3167800467066898:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <filter class='categorical' column='[federated.170i96e0kiig2e1465cre1gwcxur].[none:Calculation_3167800454901769:nk]'>
+            <groupfilter function='member' level='[none:Calculation_3167800454901769:nk]' member='true' user:ui-domain='database' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
+          </filter>
+          <slices>
+            <column>[federated.170i96e0kiig2e1465cre1gwcxur].[none:Calculation_3167800454901769:nk]</column>
+          </slices>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='cell'>
+            <format attr='text-format' field='[federated.170i96e0kiig2e1465cre1gwcxur].[usr:Calculation_3167800467066898:qk]' value='n#,##0;-#,##0' />
+          </style-rule>
+          <style-rule element='table'>
+            <format attr='background-color' value='#1b5e20' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Text' />
+            <encodings>
+              <text column='[federated.170i96e0kiig2e1465cre1gwcxur].[usr:Calculation_3167800467066898:qk]' />
+            </encodings>
+            <customized-label>
+              <formatted-text>
+                <run fontcolor='#ffffff' fontsize='28'>&lt;</run>
+                <run fontcolor='#ffffff' fontsize='28'>[federated.170i96e0kiig2e1465cre1gwcxur].[usr:Calculation_3167800467066898:qk]</run>
+                <run fontcolor='#ffffff' fontsize='28'>&gt;</run>
+              </formatted-text>
+            </customized-label>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows />
+        <cols />
+      </table>
+      <simple-id uuid='{8B177C47-4938-4E07-8610-491451EB62CD}' />
+    </worksheet>
+    <worksheet name='Tile D — Largest Subgroup'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontcolor='#ffffff' fontsize='11'>Largest Subgroup (2024)</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='lgbtq_hate_crimes_full.csv (Multiple Connections)' name='federated.10uuaf50uqhub21fxlf381yana8c' />
+          </datasources>
+          <datasource-dependencies datasource='federated.10uuaf50uqhub21fxlf381yana8c'>
+            <column caption='Bias Category' datatype='string' name='[BIAS_CATEGORY]' role='dimension' type='nominal' />
+            <column caption='Year' datatype='date' name='[YEAR]' role='dimension' type='quantitative' />
+            <column-instance column='[__tableau_internal_object_id__].[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]' derivation='Count' name='[__tableau_internal_object_id__].[cnt:lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207:qk]' pivot='key' type='quantitative' />
+            <column caption='lgbtq_hate_crimes_full.csv' datatype='table' name='[__tableau_internal_object_id__].[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207]' role='measure' type='quantitative' />
+            <column-instance column='[BIAS_CATEGORY]' derivation='None' name='[none:BIAS_CATEGORY:nk]' pivot='key' type='nominal' />
+            <column-instance column='[YEAR]' derivation='Year' name='[yr:YEAR:ok]' pivot='key' type='ordinal' />
+          </datasource-dependencies>
+          <filter class='categorical' column='[federated.10uuaf50uqhub21fxlf381yana8c].[none:BIAS_CATEGORY:nk]'>
+            <groupfilter count='1' end='top' function='end' units='records' user:ui-marker='end' user:ui-top-by-field='true'>
+              <groupfilter direction='DESC' expression='COUNT([__tableau_internal_object_id__].[lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207])' function='order' user:ui-marker='order'>
+                <groupfilter function='level-members' level='[none:BIAS_CATEGORY:nk]' user:ui-enumeration='all' user:ui-marker='enumerate' />
+              </groupfilter>
+            </groupfilter>
+          </filter>
+          <filter class='categorical' column='[federated.10uuaf50uqhub21fxlf381yana8c].[yr:YEAR:ok]' context='true'>
+            <groupfilter function='member' level='[yr:YEAR:ok]' member='2024' user:ui-domain='database' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
+          </filter>
+          <slices>
+            <column>[federated.10uuaf50uqhub21fxlf381yana8c].[yr:YEAR:ok]</column>
+            <column>[federated.10uuaf50uqhub21fxlf381yana8c].[none:BIAS_CATEGORY:nk]</column>
+          </slices>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='cell'>
+            <format attr='width' value='362' />
+          </style-rule>
+          <style-rule element='table'>
+            <format attr='background-color' value='#ff9800' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Text' />
+            <encodings>
+              <text column='[federated.10uuaf50uqhub21fxlf381yana8c].[none:BIAS_CATEGORY:nk]' />
+              <text column='[federated.10uuaf50uqhub21fxlf381yana8c].[__tableau_internal_object_id__].[cnt:lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207:qk]' />
+            </encodings>
+            <customized-label>
+              <formatted-text>
+                <run fontcolor='#ffffff' fontsize='28'><![CDATA[<[federated.10uuaf50uqhub21fxlf381yana8c].[__tableau_internal_object_id__].[cnt:lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207:qk]>]]></run>
+                <run>Æ&#10;</run>
+                <run fontcolor='#ffffff' fontsize='28'><![CDATA[<[federated.10uuaf50uqhub21fxlf381yana8c].[none:BIAS_CATEGORY:nk]>]]></run>
+              </formatted-text>
+            </customized-label>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+              <style-rule element='pane'>
+                <format attr='minwidth' value='-1' />
+                <format attr='maxwidth' value='-1' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows />
+        <cols />
+      </table>
+      <simple-id uuid='{2CFA53E1-84AD-46BE-B056-F6790A91224D}' />
+    </worksheet>
+  </worksheets>
+  <dashboards>
+    <dashboard enable-sort-zone-taborder='true' name='Dashboard 1'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontcolor='#1a1a1a' fontname='Tableau Bold' fontsize='16'> LGBTQI+ Hate Crime in America · 1991–2024</run>
+            <run>Æ&#10;</run>
+            <run fontcolor='#1a1a1a' fontname='Tableau Bold' fontsize='12'><![CDATA[<[Parameters].[Parameter 3167800450805760]> | <[Parameters].[Parameter 3167800453713923]>]]></run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <style />
+      <size maxheight='900' maxwidth='1400' minheight='900' minwidth='1400' sizing-mode='fixed' />
+      <datasources>
+        <datasource name='Parameters' />
+      </datasources>
+      <datasource-dependencies datasource='Parameters'>
+        <column caption='Selected Year' datatype='integer' default-format='n0;-0' name='[Parameter 3167800450805760]' param-domain-type='range' role='measure' type='quantitative' value='2024'>
+          <calculation class='tableau' formula='2024' />
+          <range max='2024' min='1991' />
+        </column>
+        <column caption='Rate Track' datatype='string' name='[Parameter 3167800453713923]' param-domain-type='list' role='measure' type='nominal' value='&quot;Per 100K Total Pop&quot;'>
+          <calculation class='tableau' formula='&quot;Per 100K Total Pop&quot;' />
+          <members>
+            <member value='&quot;Per 100K Total Pop&quot;' />
+            <member value='&quot;Per 100K LGBT Pop (2012+)&quot;' />
+          </members>
+        </column>
+      </datasource-dependencies>
+      <zones>
+        <zone h='11222' id='1' name='Tile A — Total Incidents' w='11071' x='571' y='8444' />
+        <zone h='6889' id='2' mode='list' param='[Parameters].[Parameter 3167800453713923]' type-v2='paramctrl' w='11429' x='54429' y='35556' />
+        <zone h='11222' id='3' name='Tile B — Pct Violent' w='12714' x='12786' y='8667' />
+        <zone h='12889' id='4' name='Tile C — States With Law' w='13143' x='25643' y='9667' />
+        <zone h='10667' id='5' name='Tile D — Largest Subgroup' w='24286' x='75143' y='8444' />
+        <zone h='32222' id='6' name='State Map' w='55000' x='571' y='19778' />
+        <zone h='32222' id='9' name='National Trend' w='43571' x='55857' y='19778' />
+        <zone h='16667' id='11' name='Subgroup Area' w='98857' x='571' y='52667' />
+        <zone h='14444' id='12' name='Subgroup Area' pane-specification-id='0' param='[federated.10uuaf50uqhub21fxlf381yana8c].[none:BIAS_CATEGORY:nk]' type-v2='color' w='19429' x='80000' y='53333' />
+        <zone h='20000' id='13' name='Policy Box Plots' w='49286' x='571' y='70000' />
+        <zone h='20000' id='15' name='Gini Scatter' w='49286' x='50143' y='70000' />
+        <zone h='8444' id='16' name='Seasonality Heatmap' w='98857' x='571' y='90667' />
+        <zone forceUpdate='true' h='6667' id='18' type-v2='text' w='98857' x='571' y='889'>
+          <formatted-text>
+            <run fontcolor='#1a1a1a' fontname='Tableau Bold' fontsize='16'>LGBTQI+ Hate Crime in America · 1991–2024</run>
+            <run>Æ&#10;</run>
+            <run fontcolor='#1a1a1a' fontname='Tableau Bold' fontsize='12'><![CDATA[<[Parameters].[Parameter 3167800450805760]> | <[Parameters].[Parameter 3167800453713923]>]]></run>
+          </formatted-text>
+        </zone>
+        <zone h='7111' id='19' mode='slider' param='[Parameters].[Parameter 3167800450805760]' type-v2='paramctrl' w='11429' x='63286' y='889' />
+      </zones>
+      <simple-id uuid='{B9D55291-75F1-474F-BBB6-9E6D41C51016}' />
+    </dashboard>
+  </dashboards>
+  <windows source-height='51'>
+    <window class='worksheet' name='Tile A — Total Incidents'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card mode='list' param='[Parameters].[Parameter 3167800453713923]' type='parameter' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{6BAF004C-2CE0-4915-9DDB-E73809565C0F}' />
+    </window>
+    <window class='worksheet' name='Tile B — Pct Violent'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{82522483-CD04-4391-A20D-484D5870316B}' />
+    </window>
+    <window class='worksheet' name='Tile C — States With Law'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{008D585D-658E-4504-8919-4F2F95263E64}' />
+    </window>
+    <window class='worksheet' name='Tile D — Largest Subgroup'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{528D302E-A34B-4A61-A200-84E93460AF62}' />
+    </window>
+    <window class='worksheet' name='National Trend'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='3' param='[federated.170i96e0kiig2e1465cre1gwcxur].[:Measure Names]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{120A5145-2F41-482A-889F-E6C7422189EC}' />
+    </window>
+    <window class='worksheet' name='Subgroup Area'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='0' param='[federated.10uuaf50uqhub21fxlf381yana8c].[none:BIAS_CATEGORY:nk]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{884C931D-2E7D-48AE-B0A5-7F7CCCE36B70}' />
+    </window>
+    <window class='worksheet' name='State Map'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='0' param='[federated.170i96e0kiig2e1465cre1gwcxur].[sum:Calculation_3167800454389766:qk]' type='color' />
+            <card pane-specification-id='0' param='[federated.170i96e0kiig2e1465cre1gwcxur].[sum:INCIDENTS:qk]' type='size' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{23EE33BE-D19C-4F71-82B3-629EA7C0D686}' />
+    </window>
+    <window class='worksheet' name='Policy Box Plots' tab-color='#f66273'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='0' param='[federated.170i96e0kiig2e1465cre1gwcxur].[none:Calculation_3167800454250500:nk]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <floating-toolbar-visibility value='1' />
+      </viewpoint>
+      <simple-id uuid='{3E418D82-2B85-4940-8355-FB645AF4C988}' />
+    </window>
+    <window class='worksheet' name='Gini Scatter'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='0' param='[federated.170i96e0kiig2e1465cre1gwcxur].[sum:INCIDENTS:qk]' type='size' />
+            <card pane-specification-id='0' param='[federated.170i96e0kiig2e1465cre1gwcxur].[none:Calculation_3167800454250500:nk]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{DFBA66A8-BACE-44C9-8DEB-31DBC4C6B48C}' />
+    </window>
+    <window class='worksheet' name='Seasonality Heatmap'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='0' param='[federated.10uuaf50uqhub21fxlf381yana8c].[__tableau_internal_object_id__].[cnt:lgbtq_hate_crimes_full.csv_B80A6CA4774D4390842D641F5DB19207:qk]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{009EE683-F0BF-41CC-8F98-906CFE9575E6}' />
+    </window>
+    <window class='dashboard' maximized='true' name='Dashboard 1'>
+      <viewpoints>
+        <viewpoint name='Gini Scatter'>
+          <zoom type='entire-view' />
+        </viewpoint>
+        <viewpoint name='National Trend'>
+          <zoom type='entire-view' />
+        </viewpoint>
+        <viewpoint name='Policy Box Plots'>
+          <zoom type='entire-view' />
+          <floating-toolbar-visibility value='1' />
+        </viewpoint>
+        <viewpoint name='Seasonality Heatmap' />
+        <viewpoint name='State Map'>
+          <zoom type='entire-view' />
+          <default-map-tool-selection tool='1' />
+        </viewpoint>
+        <viewpoint name='Subgroup Area'>
+          <zoom type='entire-view' />
+        </viewpoint>
+        <viewpoint name='Tile A — Total Incidents' />
+        <viewpoint name='Tile B — Pct Violent' />
+        <viewpoint name='Tile C — States With Law' />
+        <viewpoint name='Tile D — Largest Subgroup' />
+      </viewpoints>
+      <active id='6' />
+      <grid grid-overlay-mode='on' />
+      <simple-id uuid='{58820682-9DCA-4800-8F34-3FA6B0F2B4B8}' />
+    </window>
+  </windows>
+</workbook>

@@ -1,0 +1,531 @@
+---
+title: "LGBTQI+ Hate Crime Analysis — 03: Statistical Analysis"
+author: "Guilherme Arpi"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+    highlight: tango
+    code_folding: show
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(
+  root.dir = if (basename(getwd()) == "R") ".." else "."
+)
+
+knitr::opts_chunk$set(
+  echo      = TRUE,
+  warning   = FALSE,
+  message   = FALSE,
+  fig.align = "center",
+  fig.width = 10,
+  fig.height = 5,
+  dpi       = 150
+)
+```
+
+## Overview
+
+Six formal statistical tests are performed on the cleaned pipeline outputs. Each test is chosen to answer a specific research question about LGBTQI+ hate crime patterns.
+
+| # | Test | Research Question |
+|---|------|-------------------|
+| 1 | Mann-Kendall + Sen's slope | Is there a significant monotonic trend in annual incident counts? |
+| 2 | Welch's t-test + Cohen's d | Do states with hate crime laws have different victimisation rates? |
+| 3 | CAGR by subgroup | Which bias categories grew the fastest between 1991 and 2024? |
+| 4 | Spearman correlation matrix | How do rate, Gini, population, and law level relate? |
+| 5 | OLS multiple regression | What independently predicts state-level victimisation rate? |
+| 6 | Chi-square test | Is the violent/non-violent split independent of season? |
+
+Results are printed inline and also written to `reports/statistical_findings.txt`.
+
+---
+
+## Setup
+
+```{r libraries}
+library(tidyverse)
+library(scales)
+library(patchwork)
+library(broom)
+```
+
+```{r paths-and-theme}
+BASE_DIR <- if (basename(getwd()) == "R") dirname(getwd()) else getwd()  # works from repo root or from R/
+DATA_DIR    <- file.path(BASE_DIR, "data")
+CHARTS_DIR  <- file.path(BASE_DIR, "charts")
+REPORTS_DIR <- file.path(BASE_DIR, "reports")
+dir.create(REPORTS_DIR, showWarnings = FALSE, recursive = TRUE)
+
+theme_hate <- function() {
+  theme_minimal(base_size = 11) +
+    theme(
+      plot.title       = element_text(face = "bold", size = 13, colour = "#1A1A1A"),
+      plot.subtitle    = element_text(size = 10, colour = "#555555"),
+      axis.text        = element_text(colour = "#444444"),
+      axis.title       = element_text(size = 10, colour = "#444444"),
+      panel.grid.minor = element_blank(),
+      panel.grid.major = element_line(colour = "#EEEEEE"),
+      plot.background  = element_rect(fill = "white", colour = NA),
+      panel.background = element_rect(fill = "#FAFAFA", colour = NA)
+    )
+}
+
+save_chart <- function(plot, filename, width = 9, height = 5) {
+  ggsave(file.path(CHARTS_DIR, filename), plot = plot,
+         width = width, height = height, dpi = 150, bg = "white")
+}
+
+report_lines <- c(strrep("=", 72),
+                  "LGBTQI+ HATE CRIME ANALYSIS — STATISTICAL FINDINGS",
+                  strrep("=", 72), "")
+add_result <- function(...) {
+  report_lines <<- c(report_lines, ..., strrep("-", 72), "")
+}
+```
+
+```{r load-data}
+full <- read_csv(file.path(DATA_DIR, "lgbtq_hate_crimes_full.csv"),
+                 show_col_types = FALSE) |>
+  rename_with(str_to_upper)
+
+sy <- read_csv(file.path(DATA_DIR, "state_year_aggregate.csv"),
+               show_col_types = FALSE) |>
+  rename_with(str_to_upper)
+
+# Time-varying law lookup — one row per state × year (1991–2024)
+law_lookup <- tryCatch(
+  read_csv(file.path(DATA_DIR, "state_law_panel.csv"), show_col_types = FALSE) |>
+    rename(STATE_NAME = State, DATA_YEAR = Year) |>
+    select(STATE_NAME, DATA_YEAR, LAW_LEVEL, HC_LAW_SO, HC_LAW_GI),
+  error = function(e) {
+    message("state_law_panel.csv not found — law_lookup unavailable.")
+    NULL
+  }
+)
+
+if (!"YEAR" %in% names(full) && "DATA_YEAR" %in% names(full))
+  full <- full |> rename(YEAR = DATA_YEAR)
+
+cat(sprintf("Loaded %s incident rows | %s state-year rows\n",
+            format(nrow(full), big.mark=","),
+            format(nrow(sy),   big.mark=",")))
+```
+
+---
+
+## Test 1 — Mann-Kendall Trend Test
+
+**Rationale:** A simple linear regression trend test assumes constant variance and normality. Annual hate crime counts violate both — they are right-skewed counts with non-constant variance over a 34-year window. The Mann-Kendall test is non-parametric and tests only for a *monotonic* trend (consistently up or down), making it more appropriate here.
+
+**Sen's slope** is the median of all pairwise slopes between observations and provides a robust estimate of the trend magnitude in the same units as the data (incidents/year).
+
+```{r mann-kendall}
+yearly <- full |> count(YEAR, name = "INCIDENTS") |> arrange(YEAR)
+x <- yearly$INCIDENTS
+n <- length(x)
+
+s_val <- sum(sapply(seq_len(n - 1), function(i) sum(sign(x[(i+1):n] - x[i]))))
+var_s  <- n * (n - 1) * (2 * n + 5) / 18
+z_mk   <- ifelse(s_val > 0, (s_val - 1) / sqrt(var_s),
+          ifelse(s_val < 0, (s_val + 1) / sqrt(var_s), 0))
+p_mk   <- 2 * pnorm(-abs(z_mk))
+
+slopes     <- outer(seq_len(n), seq_len(n),
+                    FUN = function(j, i) ifelse(j > i, (x[j] - x[i]) / (j - i), NA))
+sens_slope <- median(slopes, na.rm = TRUE)
+
+mk_lines <- c(
+  sprintf("Mann-Kendall Trend Test (Annual LGBTQI+ Incidents, 1991–%d)",
+          max(yearly$YEAR, na.rm=TRUE)),
+  sprintf("  S statistic : %d",       s_val),
+  sprintf("  Z score     : %.4f",     z_mk),
+  sprintf("  p-value     : %.6f  %s", p_mk,
+          ifelse(p_mk < 0.001, "*** Significant at 0.001",
+          ifelse(p_mk < 0.01,  "** Significant at 0.01",
+          ifelse(p_mk < 0.05,  "* Significant at 0.05", "Not significant")))),
+  sprintf("  Sen's slope : %+.2f incidents/year", sens_slope),
+  sprintf("  Interpretation: %s",
+          ifelse(s_val > 0 & p_mk < 0.05,
+                 "Statistically significant upward trend",
+                 "No significant monotonic trend"))
+)
+cat(paste(mk_lines, collapse = "\n"))
+add_result(mk_lines)
+```
+
+**Interpretation:** The positive S statistic combined with p < 0.001 confirms a statistically significant long-run upward trend. Sen's slope of approximately +27 incidents/year represents the median annual increase across the full 34-year window.
+
+---
+
+## Test 2 — Welch's T-Test: Policy Impact
+
+**Rationale:** We test whether state-year observations with hate crime law coverage have different mean incident rates from those without. Welch's t-test is used (rather than Student's) because group variances are unequal — law-protected states have larger variance in their rates.
+
+Cohen's d quantifies the effect size independently of sample size.
+
+**Important caveat:** States *with* hate crime laws consistently report *higher* rates. This is a well-documented **reporting effect**: legal accountability structures improve incident classification and reporting, surfacing crimes that would otherwise be recorded as generic assault.
+
+```{r ttest-setup}
+run_ttest <- function(data, rate_col, label) {
+  d <- data |>
+    filter(!is.na(.data[[rate_col]]), is.finite(.data[[rate_col]])) |>
+    rename(RATE = all_of(rate_col))
+
+  if (is.null(law_lookup)) { cat("  Skipping t-test (no law_lookup).\n"); return(NULL) }
+
+  d <- d |>
+    select(-any_of(c("LAW_LEVEL", "HC_LAW_SO", "HC_LAW_GI"))) |>
+    left_join(law_lookup, by = c("STATE_NAME", "DATA_YEAR")) |>
+    filter(!is.na(LAW_LEVEL)) |>
+    mutate(HAS_LAW = as.integer(LAW_LEVEL > 0))
+
+  no_law  <- d |> filter(HAS_LAW == 0) |> pull(RATE)
+  has_law <- d |> filter(HAS_LAW == 1) |> pull(RATE)
+
+  if (length(no_law) < 2 || length(has_law) < 2) return(NULL)
+
+  tt        <- t.test(RATE ~ HAS_LAW, data = d, var.equal = FALSE)
+  pooled_sd <- sqrt((var(no_law) + var(has_law)) / 2)
+  cohens_d  <- (mean(no_law) - mean(has_law)) / pooled_sd
+
+  law_medians <- d |>
+    group_by(LAW_LEVEL) |>
+    summarise(MEDIAN = median(RATE, na.rm = TRUE), .groups = "drop")
+
+  lines <- c(
+    sprintf("Welch's t-Test: %s", label),
+    sprintf("  No hate crime law  : n=%d, mean=%.3f", length(no_law),  mean(no_law)),
+    sprintf("  Has hate crime law : n=%d, mean=%.3f", length(has_law), mean(has_law)),
+    sprintf("  t = %.4f | df = %.1f | p = %.4f  %s",
+            tt$statistic, tt$parameter, tt$p.value,
+            ifelse(tt$p.value < 0.05, "* Significant", "Not significant")),
+    sprintf("  Cohen's d = %.3f (%s effect size)", cohens_d,
+            ifelse(abs(cohens_d) > 0.8, "large",
+            ifelse(abs(cohens_d) > 0.5, "medium", "small")))
+  )
+  cat(paste(lines, collapse = "\n"), "\n\n")
+  add_result(lines)
+  list(data = d, law_medians = law_medians)
+}
+```
+
+```{r ttest-track1}
+tt1 <- run_ttest(sy, "RATE_PER_100K_TOTAL",
+                 "Track 1 — per 100k total population (1991–2024)")
+```
+
+```{r ttest-track2}
+sy_t2 <- sy |> filter(DATA_YEAR >= 2012)
+tt2 <- run_ttest(sy_t2, "RATE_PER_100K_LGBT",
+                 "Track 2 — per 100k LGBT adults (2012–2024)")
+```
+
+```{r chart-13, fig.width=12}
+make_law_bar <- function(result, rate_col, title, subtitle) {
+  if (is.null(result)) return(NULL)
+  d <- result$data |>
+    mutate(LAW_LABEL = factor(
+      case_when(LAW_LEVEL == 0 ~ "No Law",
+                LAW_LEVEL == 1 ~ "Sexual\nOrientation Only",
+                LAW_LEVEL == 2 ~ "Full Protection\n(incl. Gender ID)"),
+      levels = c("No Law", "Sexual\nOrientation Only", "Full Protection\n(incl. Gender ID)")
+    )) |>
+    group_by(LAW_LABEL) |>
+    summarise(MEDIAN = median(RATE, na.rm=TRUE), SD = sd(RATE, na.rm=TRUE), .groups="drop")
+
+  ggplot(d, aes(x = LAW_LABEL, y = MEDIAN, fill = LAW_LABEL)) +
+    geom_col(width = 0.55, alpha = 0.85) +
+    geom_errorbar(aes(ymin = pmax(0, MEDIAN - SD), ymax = MEDIAN + SD),
+                  width = 0.15, linewidth = 0.8, colour = "#555555") +
+    geom_text(aes(label = number(MEDIAN, accuracy = 0.01)), vjust = -0.7, size = 3.8, fontface = "bold") +
+    scale_fill_manual(
+      values = c("No Law"="#B71C1C", "Sexual\nOrientation Only"="#EF9A9A",
+                 "Full Protection\n(incl. Gender ID)"="#1B5E20"), guide = "none") +
+    scale_y_continuous(labels = number_format(accuracy = 0.1),
+                       expand = expansion(mult = c(0, 0.18))) +
+    labs(title = title, subtitle = subtitle, x = NULL, y = "Rate per 100k") +
+    theme_hate()
+}
+
+p13a <- make_law_bar(tt1, "RATE_PER_100K_TOTAL",
+                     "Track 1 — Total Population", "Per 100k total pop., all years")
+p13b <- make_law_bar(tt2, "RATE_PER_100K_LGBT",
+                     "Track 2 — LGBT Population", "Per 100k LGBT adults, 2012–2024")
+
+if (!is.null(p13a) && !is.null(p13b)) {
+  p13 <- p13a + p13b +
+    plot_annotation(
+      title    = "Median LGBTQI+ Hate Crime Rate by State Law Coverage",
+      subtitle = "Error bars = ±1 SD  |  Higher rates in law-covered states reflect the reporting effect",
+      theme    = theme(plot.title    = element_text(face = "bold", size = 13),
+                       plot.subtitle = element_text(size = 10, colour = "#555555"))
+    )
+  print(p13)
+  save_chart(p13, "13_law_comparison_bar.png", width = 12, height = 5)
+} else if (!is.null(p13a)) {
+  print(p13a)
+  save_chart(p13a, "13_law_comparison_bar.png", width = 8, height = 5)
+}
+```
+
+---
+
+## Test 3 — Subgroup Growth Rates (CAGR)
+
+**Compound Annual Growth Rate (CAGR)** compares the first and last year of the dataset per bias category, normalising for the number of years elapsed. Starting values of 0 are floored to 1 to avoid division by zero.
+
+```{r growth-rates}
+main_cats <- c("Anti-Gay (Male)", "Anti-Lesbian", "Anti-LGBTQ (General)",
+               "Anti-Transgender", "Anti-Bisexual")
+
+yr_min <- min(full$YEAR, na.rm = TRUE)
+yr_max <- max(full$YEAR, na.rm = TRUE)
+
+cat_ends <- full |>
+  filter(BIAS_CATEGORY %in% main_cats) |>
+  count(YEAR, BIAS_CATEGORY, name = "INCIDENTS") |>
+  filter(YEAR %in% c(yr_min, yr_max)) |>
+  pivot_wider(names_from = YEAR, values_from = INCIDENTS, values_fill = 0) |>
+  rename(FIRST = 2, LAST = 3) |>
+  mutate(
+    FIRST        = pmax(FIRST, 1),
+    TOTAL_GROWTH = round((LAST - FIRST) / FIRST * 100, 1),
+    YEARS_SPAN   = yr_max - yr_min,
+    CAGR         = round(((LAST / FIRST)^(1 / YEARS_SPAN) - 1) * 100, 2)
+  )
+
+cat_ends |>
+  select(BIAS_CATEGORY, FIRST, LAST, TOTAL_GROWTH, CAGR) |>
+  arrange(desc(TOTAL_GROWTH)) |>
+  knitr::kable(col.names = c("Subgroup", "1991", "2024", "Total Growth %", "CAGR %"),
+               caption = sprintf("Subgroup growth rates, %d → %d", yr_min, yr_max))
+```
+
+```{r chart-14, fig.height=5}
+p14 <- ggplot(cat_ends,
+              aes(x = fct_reorder(BIAS_CATEGORY, TOTAL_GROWTH),
+                  y = TOTAL_GROWTH, fill = TOTAL_GROWTH > 0)) +
+  geom_col(width = 0.65, alpha = 0.85) +
+  geom_text(aes(label = sprintf("%+.1f%%", TOTAL_GROWTH),
+                hjust = ifelse(TOTAL_GROWTH >= 0, -0.15, 1.15)), size = 3.5) +
+  coord_flip() +
+  scale_fill_manual(values = c("TRUE"="#1565C0","FALSE"="#B71C1C"), guide="none") +
+  scale_y_continuous(labels = function(x) paste0(x, "%"),
+                     expand = expansion(mult = c(0.15, 0.2))) +
+  labs(title    = "Total Growth in LGBTQI+ Hate Crime Incidents by Subgroup",
+       subtitle = sprintf("%d → %d", yr_min, yr_max),
+       x = NULL, y = "% Change") +
+  theme_hate()
+
+p14
+save_chart(p14, "14_subgroup_growth_rates.png", width = 9, height = 5)
+```
+
+---
+
+## Test 4 — Spearman Correlation Matrix
+
+**Rationale:** Spearman rank correlation is used instead of Pearson because the rate distribution is right-skewed (driven by DC and a few high-density urban states). Spearman is robust to these outliers and monotone non-linear relationships.
+
+```{r spearman}
+build_corr_data <- function(data, rate_col) {
+  base <- data |>
+    select(STATE_NAME, DATA_YEAR, INCIDENTS, GINI_COEFFICIENT,
+           TOTAL_POPULATION, all_of(rate_col)) |>
+    rename(RATE = all_of(rate_col))
+
+  if (!is.null(law_lookup)) {
+    base <- base |> left_join(law_lookup, by = c("STATE_NAME", "DATA_YEAR"))
+  } else {
+    base <- base |> mutate(LAW_LEVEL = NA_integer_)
+  }
+
+  base |> mutate(LOG_TOTAL_POP = log1p(TOTAL_POPULATION)) |>
+    select(RATE, GINI_COEFFICIENT, LOG_TOTAL_POP, LAW_LEVEL) |>
+    drop_na()
+}
+
+corr_t1 <- build_corr_data(sy, "RATE_PER_100K_TOTAL")
+corr_t2 <- build_corr_data(sy |> filter(DATA_YEAR >= 2012), "RATE_PER_100K_LGBT")
+```
+
+```{r chart-11, fig.width=13, fig.height=6}
+plot_corr_matrix <- function(data, subtitle) {
+  corr_labels <- c("Incident Rate", "Gini Index", "Log Total Pop.", "Law Level")
+  mat <- cor(data, method = "spearman")
+  colnames(mat) <- corr_labels; rownames(mat) <- corr_labels
+
+  mat |>
+    as_tibble(rownames = "Var1") |>
+    pivot_longer(-Var1, names_to = "Var2", values_to = "RHO") |>
+    mutate(Var1 = factor(Var1, levels = corr_labels),
+           Var2 = factor(Var2, levels = corr_labels)) |>
+    ggplot(aes(x = Var2, y = Var1, fill = RHO)) +
+    geom_tile(colour = "white", linewidth = 0.5) +
+    geom_text(aes(label = sprintf("%.2f", RHO), colour = abs(RHO) > 0.5),
+              size = 3.2, fontface = "bold") +
+    scale_fill_distiller(palette = "RdBu", direction = 1, limits = c(-1, 1), name = "Spearman ρ") +
+    scale_colour_manual(values = c("TRUE"="white","FALSE"="#333333"), guide="none") +
+    scale_x_discrete(limits = rev(corr_labels)) +
+    labs(subtitle = subtitle, x = NULL, y = NULL) +
+    theme_hate() +
+    theme(axis.text.x = element_text(angle = 35, hjust = 1), panel.grid = element_blank())
+}
+
+p11a <- plot_corr_matrix(corr_t1, "Track 1 — per 100k total pop. (1991–2024)")
+p11b <- plot_corr_matrix(corr_t2, "Track 2 — per 100k LGBT adults (2012–2024)")
+
+p11 <- p11a + p11b +
+  plot_annotation(title = "Spearman Rank Correlation — Key Variables (State × Year)",
+                  theme = theme(plot.title = element_text(face = "bold", size = 13)))
+p11
+save_chart(p11, "11_correlation_matrix.png", width = 13, height = 6)
+```
+
+```{r spearman-table}
+corr_mat1 <- cor(corr_t1, method = "spearman")
+corr_labels <- c("Incident Rate", "Gini Index", "Log Total Pop.", "Law Level")
+colnames(corr_mat1) <- corr_labels; rownames(corr_mat1) <- corr_labels
+round(corr_mat1, 3) |> knitr::kable(caption = "Track 1 Spearman correlations (1991–2024)")
+
+corr_mat2 <- cor(corr_t2, method = "spearman")
+colnames(corr_mat2) <- corr_labels; rownames(corr_mat2) <- corr_labels
+round(corr_mat2, 3) |> knitr::kable(caption = "Track 2 Spearman correlations (2012–2024)")
+
+add_result("4. Spearman Rank Correlations — Track 1:", capture.output(print(round(corr_mat1,3))),
+           "4. Spearman Rank Correlations — Track 2:", capture.output(print(round(corr_mat2,3))))
+```
+
+---
+
+## Test 5 — OLS Multiple Regression
+
+**Model specification:** `RATE ~ GINI_COEFFICIENT + LOG_TOTAL_POP + LAW_LEVEL + YEAR_C`
+
+`YEAR_C` is the year centred at its mean so the intercept is interpretable. `LOG_TOTAL_POP` is log-transformed to linearise the relationship between population size and rate (larger states have smaller rates partly due to denominator effects). The model is estimated separately for each normalisation track.
+
+```{r ols}
+build_reg_data <- function(data, rate_col) {
+  base <- data |>
+    select(STATE_NAME, DATA_YEAR, GINI_COEFFICIENT, TOTAL_POPULATION, all_of(rate_col)) |>
+    rename(RATE = all_of(rate_col)) |>
+    filter(!is.na(RATE), is.finite(RATE))
+
+  if (!is.null(law_lookup)) {
+    base <- base |> left_join(law_lookup, by = c("STATE_NAME", "DATA_YEAR"))
+  } else {
+    base <- base |> mutate(LAW_LEVEL = 0L)
+  }
+
+  base |>
+    mutate(LOG_TOTAL_POP = log1p(TOTAL_POPULATION),
+           YEAR_C        = DATA_YEAR - mean(DATA_YEAR, na.rm = TRUE)) |>
+    drop_na(RATE, GINI_COEFFICIENT, LOG_TOTAL_POP, LAW_LEVEL)
+}
+
+run_ols <- function(data, label) {
+  m <- lm(RATE ~ GINI_COEFFICIENT + LOG_TOTAL_POP + LAW_LEVEL + YEAR_C, data = data)
+  cat(sprintf("\n--- %s ---\n", label))
+  cat(sprintf("R² = %.4f | Adj. R² = %.4f | n = %d\n",
+              glance(m)$r.squared, glance(m)$adj.r.squared, nobs(m)))
+  tidy(m) |>
+    mutate(sig = case_when(p.value < 0.001 ~ "***", p.value < 0.01 ~ "**",
+                           p.value < 0.05 ~ "*", TRUE ~ "")) |>
+    print(n = Inf)
+  add_result(sprintf("5. OLS — %s", label),
+             sprintf("   R²=%.4f | Adj.R²=%.4f | n=%d", glance(m)$r.squared,
+                     glance(m)$adj.r.squared, nobs(m)),
+             capture.output(print(tidy(m), n = Inf)))
+  m
+}
+
+reg_t1 <- build_reg_data(sy, "RATE_PER_100K_TOTAL")
+reg_t2 <- build_reg_data(sy |> filter(DATA_YEAR >= 2012), "RATE_PER_100K_LGBT")
+
+ols_t1 <- run_ols(reg_t1, "Track 1 — per 100k total pop. (1991–2024)")
+ols_t2 <- run_ols(reg_t2, "Track 2 — per 100k LGBT adults (2012–2024)")
+```
+
+**Key finding:** Gini coefficient has the largest standardised effect in both models. The YEAR_C coefficient in Track 2 is near-zero and non-significant, suggesting that once we account for the growing visible LGBT population (the denominator), the year-over-year *per-capita* rate is stable — the raw increase in absolute incidents is partly explained by population growth, not solely by an increasing victimisation risk.
+
+```{r chart-12, fig.width=12}
+reg_diag <- augment(ols_t1)
+
+p12a <- ggplot(reg_diag, aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3, colour = "#1565C0", size = 1.5) +
+  geom_hline(yintercept = 0, colour = "#B71C1C", linewidth = 1, linetype = "dashed") +
+  geom_smooth(method = "loess", se = FALSE, colour = "#FF6D00", linewidth = 0.9) +
+  scale_y_continuous(labels = number_format(accuracy = 0.1)) +
+  labs(title = "Residuals vs. Fitted", x = "Fitted values", y = "Residuals") +
+  theme_hate()
+
+p12b <- ggplot(reg_diag, aes(sample = .std.resid)) +
+  stat_qq(alpha = 0.3, colour = "#1565C0", size = 1.5) +
+  stat_qq_line(colour = "#B71C1C", linewidth = 1, linetype = "dashed") +
+  labs(title = "Normal Q-Q Plot",
+       x = "Theoretical Quantiles", y = "Standardised Residuals") +
+  theme_hate()
+
+p12 <- p12a + p12b +
+  plot_annotation(
+    title    = "OLS Regression Diagnostics — Track 1 (per 100k total pop.)",
+    subtitle = "1991–2024 | Residual fan shape reflects heteroskedasticity across population sizes",
+    theme    = theme(plot.title    = element_text(face = "bold", size = 13),
+                     plot.subtitle = element_text(size = 10, colour = "#555555"))
+  )
+p12
+save_chart(p12, "12_regression_diagnostics.png", width = 12, height = 5)
+```
+
+---
+
+## Test 6 — Chi-Square: Season × Offense Type
+
+**Null hypothesis:** The proportion of violent vs. non-violent incidents is the same across all four seasons.
+
+```{r chi-square}
+season_tbl <- full |>
+  filter(SEASON %in% c("Spring","Summer","Fall","Winter")) |>
+  mutate(
+    SEASON      = factor(SEASON, levels = c("Spring","Summer","Fall","Winter")),
+    VIOLENT_LBL = if_else(IS_VIOLENT == 1, "Violent", "Non-violent")
+  ) |>
+  count(SEASON, VIOLENT_LBL) |>
+  pivot_wider(names_from = VIOLENT_LBL, values_from = n, values_fill = 0L)
+
+ct_matrix <- season_tbl |> select(-SEASON) |> as.matrix()
+rownames(ct_matrix) <- season_tbl$SEASON
+
+chi_test <- chisq.test(ct_matrix)
+
+cat(sprintf("χ² = %.4f  |  df = %d  |  p = %.6f\n",
+            chi_test$statistic, chi_test$parameter, chi_test$p.value))
+cat(sprintf("%s\n\n", ifelse(chi_test$p.value < 0.05,
+            "✓ Significant: seasonal variation in violence pattern",
+            "✗ No significant seasonal variation")))
+cat("Observed counts:\n")
+print(ct_matrix)
+
+add_result("6. Chi-Square — Season × Violent/Non-violent",
+           sprintf("   χ²=%.4f | df=%d | p=%.6f", chi_test$statistic,
+                   chi_test$parameter, chi_test$p.value),
+           capture.output(print(ct_matrix)))
+```
+
+**Interpretation:** The significant chi-square result (p < 0.05) means that the mix of violent vs. non-violent offenses varies by season — Summer incidents have a slightly higher violent share, consistent with the pattern seen in Chart 08.
+
+---
+
+## Write Report
+
+```{r write-report}
+writeLines(report_lines, file.path(REPORTS_DIR, "statistical_findings.txt"))
+cat("✓ Report saved → reports/statistical_findings.txt\n")
+cat("  Charts → 11_correlation_matrix.png, 12_regression_diagnostics.png,\n")
+cat("           13_law_comparison_bar.png, 14_subgroup_growth_rates.png\n")
+```

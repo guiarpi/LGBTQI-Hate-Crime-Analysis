@@ -1,0 +1,73 @@
+========================================================================
+LGBTQI+ HATE CRIME ANALYSIS — STATISTICAL FINDINGS
+========================================================================
+
+Mann-Kendall Trend Test (Annual LGBTQI+ Incidents, 1991–2024)
+  S statistic : 324
+  Z score     : 4.7883
+  p-value     : 0.000002  *** Significant at 0.001
+  Sen's slope : +27.38 incidents/year
+  Interpretation: Statistically significant upward trend
+------------------------------------------------------------------------
+
+Welch's t-Test: Track 1 — per 100k total population (1991–2024)
+  No hate crime law  : n=726, mean=0.357
+  Has hate crime law : n=807, mean=0.773
+  t = -8.7627 | df = 899.7 | p = 0.0000  * Significant
+  Cohen's d = -0.437 (small effect size)
+------------------------------------------------------------------------
+
+Welch's t-Test: Track 2 — per 100k LGBT adults (2012–2024)
+  No hate crime law  : n=234, mean=10.346
+  Has hate crime law : n=396, mean=14.420
+  t = -3.9365 | df = 603.1 | p = 0.0001  * Significant
+  Cohen's d = -0.297 (small effect size)
+------------------------------------------------------------------------
+
+4. Spearman Rank Correlations — Track 1:
+               Incident Rate Gini Index Log Total Pop. Law Level
+Incident Rate          1.000     -0.063         -0.167     0.290
+Gini Index            -0.063      1.000          0.506     0.235
+Log Total Pop.        -0.167      0.506          1.000     0.115
+Law Level              0.290      0.235          0.115     1.000
+4. Spearman Rank Correlations — Track 2:
+               Incident Rate Gini Index Log Total Pop. Law Level
+Incident Rate          1.000     -0.134         -0.128     0.107
+Gini Index            -0.134      1.000          0.529     0.246
+Log Total Pop.        -0.128      0.529          1.000     0.210
+Law Level              0.107      0.246          0.210     1.000
+------------------------------------------------------------------------
+
+5. OLS — Track 1 — per 100k total pop. (1991–2024)
+   R²=0.2828 | Adj.R²=0.2809 | n=1533
+# A tibble: 5 × 5
+  term             estimate std.error statistic  p.value
+  <chr>               <dbl>     <dbl>     <dbl>    <dbl>
+1 (Intercept)      -1.85      0.508       -3.64 2.77e- 4
+2 GINI_COEFFICIENT 17.6       1.11        15.9  4.98e-53
+3 LOG_TOTAL_POP    -0.393     0.0226     -17.4  6.86e-62
+4 LAW_LEVEL         0.306     0.0339       9.02 5.42e-19
+5 YEAR_C            0.00239   0.00235      1.02 3.08e- 1
+------------------------------------------------------------------------
+
+5. OLS — Track 2 — per 100k LGBT adults (2012–2024)
+   R²=0.2763 | Adj.R²=0.2717 | n=630
+# A tibble: 5 × 5
+  term             estimate std.error statistic  p.value
+  <chr>               <dbl>     <dbl>     <dbl>    <dbl>
+1 (Intercept)       -30.0      12.6      -2.38  1.78e- 2
+2 GINI_COEFFICIENT  310.       28.5      10.9   2.65e-25
+3 LOG_TOTAL_POP      -6.87      0.550   -12.5   4.18e-32
+4 LAW_LEVEL           3.65      0.741     4.92  1.10e- 6
+5 YEAR_C              0.119     0.137     0.869 3.85e- 1
+------------------------------------------------------------------------
+
+6. Chi-Square — Season × Violent/Non-violent
+   χ²=12.7106 | df=3 | p=0.005306
+       Non-violent Violent
+Spring        5834    5455
+Summer        6653    6441
+Fall          6228    5672
+Winter        4799    4236
+------------------------------------------------------------------------
+

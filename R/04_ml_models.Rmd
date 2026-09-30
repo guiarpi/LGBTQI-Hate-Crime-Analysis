@@ -1,0 +1,488 @@
+---
+title: "LGBTQI+ Hate Crime Analysis — 04: Machine Learning Models"
+author: "Guilherme Arpi"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+    highlight: tango
+    code_folding: show
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(
+  root.dir = if (basename(getwd()) == "R") ".." else "."
+)
+
+knitr::opts_chunk$set(
+  echo      = TRUE,
+  warning   = FALSE,
+  message   = FALSE,
+  fig.align = "center",
+  fig.width = 9,
+  fig.height = 5,
+  dpi       = 150,
+  cache     = FALSE   # set to TRUE if re-running frequently (CV takes 3–5 min)
+)
+```
+
+## Overview
+
+Three models are trained and evaluated using the tidymodels framework:
+
+| Model | Purpose |
+|-------|---------|
+| **K-Means (k = 4)** | Cluster state-year profiles by risk level, Gini, and violent share |
+| **Decision Tree** | Predict violent vs. non-violent incident; tuned via 5-fold CV |
+| **Random Forest (200 trees)** | Same prediction task; ensemble approach with permutation importance |
+
+**Prediction target:** `IS_VIOLENT` (binary: 0 = non-violent, 1 = violent).
+
+**Feature set:** `BIAS_CATEGORY`, `LAW_LEVEL`, `GINI`, `LOG_TOTAL_POP`, `DATA_YEAR`.
+
+`LOG_TOTAL_POP` (Track 1) is used as the population feature so all years 2010–2024 are included. `LOG_LGBT_POP` (Track 2) is available only from 2012 and is excluded from the primary model to avoid dropping 2010–2011 rows.
+
+**Important note on ROC AUC:** Both models produce ROC AUC values below 0.5. This does not indicate a coding error — it reflects that predicting whether a specific hate crime incident will be violent is inherently difficult from aggregated socioeconomic features alone. Incident-level violence is driven by situational factors (confrontation type, weapon availability, perpetrator intent) that are not captured in aggregate state-level data. The models are most useful for **feature importance** (which variables matter) rather than for incident-level prediction.
+
+---
+
+## Setup
+
+```{r libraries}
+library(tidyverse)
+library(tidymodels)
+library(rpart)
+library(rpart.plot)
+library(randomForest)
+library(cluster)
+library(factoextra)
+library(scales)
+library(patchwork)
+```
+
+```{r paths-and-theme}
+BASE_DIR <- if (basename(getwd()) == "R") dirname(getwd()) else getwd()  # works from repo root or from R/
+DATA_DIR    <- file.path(BASE_DIR, "data")
+CHARTS_DIR  <- file.path(BASE_DIR, "charts")
+REPORTS_DIR <- file.path(BASE_DIR, "reports")
+
+theme_hate <- function() {
+  theme_minimal(base_size = 11) +
+    theme(
+      plot.title       = element_text(face = "bold", size = 13, colour = "#1A1A1A"),
+      plot.subtitle    = element_text(size = 10, colour = "#555555"),
+      axis.text        = element_text(colour = "#444444"),
+      axis.title       = element_text(size = 10, colour = "#444444"),
+      panel.grid.minor = element_blank(),
+      panel.grid.major = element_line(colour = "#EEEEEE"),
+      plot.background  = element_rect(fill = "white", colour = NA),
+      panel.background = element_rect(fill = "#FAFAFA", colour = NA)
+    )
+}
+
+save_chart <- function(plot, filename, width = 9, height = 5) {
+  ggsave(file.path(CHARTS_DIR, filename), plot = plot,
+         width = width, height = height, dpi = 150, bg = "white")
+}
+
+report_lines <- c(strrep("=", 72),
+                  "LGBTQI+ HATE CRIME ANALYSIS — MACHINE LEARNING RESULTS",
+                  strrep("=", 72), "")
+add_result <- function(...) {
+  report_lines <<- c(report_lines, ..., strrep("-", 72), "")
+}
+```
+
+```{r load-data}
+sy <- read_csv(file.path(DATA_DIR, "state_year_aggregate.csv"),
+               show_col_types = FALSE) |>
+  rename_with(str_to_upper) |>
+  mutate(
+    LOG_TOTAL_POP = log1p(TOTAL_POPULATION),
+    LOG_LGBT_POP  = log1p(coalesce(LGBT_POPULATION_EST, NA_real_)),
+    VIOLENT_PCT   = coalesce(VIOLENT_COUNT / INCIDENTS * 100, 0)
+  )
+
+# Time-varying law panel for enriched dataset join
+law_panel_ml <- tryCatch(
+  read_csv(file.path(DATA_DIR, "state_law_panel.csv"), show_col_types = FALSE) |>
+    rename(STATE_NAME = State, DATA_YEAR = Year) |>
+    select(STATE_NAME, DATA_YEAR, LAW_LEVEL, HC_LAW_SO, HC_LAW_GI),
+  error = function(e) {
+    message("state_law_panel.csv not found — LAW_LEVEL will default to 0.")
+    NULL
+  }
+)
+
+# Incident-level enriched data (2010–2024) — drop stale LAW_LEVEL, join from panel
+enriched_base <- read_csv(file.path(DATA_DIR, "lgbtq_hate_crimes_enriched.csv"),
+                           show_col_types = FALSE) |>
+  rename_with(str_to_upper) |>
+  mutate(DATA_YEAR = as.integer(DATA_YEAR)) |>
+  select(-any_of(c("LAW_LEVEL", "HC_LAW_SO", "HC_LAW_GI")))
+
+enriched_joined <- if (!is.null(law_panel_ml)) {
+  left_join(enriched_base, law_panel_ml, by = c("STATE_NAME", "DATA_YEAR"))
+} else {
+  enriched_base
+}
+
+enriched <- enriched_joined |>
+  mutate(
+    LAW_LEVEL     = coalesce(as.integer(LAW_LEVEL), 0L),
+    IS_VIOLENT    = as.integer(str_detect(OFFENSE_NAME, "Assault|Murder|Robbery|Rape|Arson")),
+    GINI          = as.numeric(GINI_COEFFICIENT),
+    TOTAL_POP     = as.numeric(TOTAL_POPULATION),
+    LOG_TOTAL_POP = log1p(as.numeric(TOTAL_POPULATION)),
+    LGBT_POP      = as.numeric(coalesce(as.character(LGBT_POPULATION), NA_character_)),
+    LOG_LGBT_POP  = log1p(coalesce(as.numeric(LGBT_POPULATION), NA_real_))
+  ) |>
+  filter(!is.na(TOTAL_POP), TOTAL_POP > 0)
+
+cat(sprintf("State-year: %s rows | Enriched: %s rows (%d–%d)\n",
+            format(nrow(sy), big.mark=","),
+            format(nrow(enriched), big.mark=","),
+            min(as.integer(enriched$DATA_YEAR), na.rm=TRUE),
+            max(as.integer(enriched$DATA_YEAR), na.rm=TRUE)))
+```
+
+---
+
+## 1. K-Means Clustering (k = 4)
+
+K-Means groups state-year observations into four risk profile clusters based on three features: **incident rate per 100k total population (Track 1)**, **Gini coefficient**, and **% violent incidents**. All features are scaled before clustering.
+
+Track 1 is used here (rather than Track 2) so the full 1991–2024 range is included. The elbow plot is used to verify that k = 4 is a defensible choice.
+
+```{r kmeans, cache=TRUE}
+cluster_feats <- c("RATE_PER_100K_TOTAL", "GINI_COEFFICIENT", "VIOLENT_PCT")
+X_cl <- sy |> select(all_of(cluster_feats)) |> drop_na() |> scale()
+
+set.seed(42)
+km    <- kmeans(X_cl, centers = 4, nstart = 25, iter.max = 300)
+sy_cl <- sy |>
+  drop_na(all_of(cluster_feats)) |>
+  mutate(CLUSTER = factor(km$cluster))
+
+profiles <- sy_cl |>
+  group_by(CLUSTER) |>
+  summarise(across(all_of(cluster_feats), \(x) mean(x, na.rm=TRUE),
+                   .names = "MEAN_{.col}"),
+            N = n())
+
+profiles |>
+  knitr::kable(digits = 3, caption = "K-Means cluster profiles (k = 4)")
+
+add_result("1. K-Means Cluster Profiles (k=4):", capture.output(print(profiles)))
+```
+
+```{r kmeans-elbow, cache=TRUE}
+wss_vals <- map_dbl(1:8, ~ kmeans(X_cl, centers = .x, nstart = 10)$tot.withinss)
+```
+
+```{r chart-15, fig.width=15}
+CLUSTER_COLORS <- c("1"="#1565C0","2"="#B71C1C","3"="#2E7D32","4"="#F57F17")
+
+p_elbow <- ggplot(tibble(K = 1:8, WSS = wss_vals), aes(x = K, y = WSS)) +
+  geom_line(colour = "#1565C0", linewidth = 1.2) +
+  geom_point(colour = "#1565C0", size = 3) +
+  scale_x_continuous(breaks = 1:8) +
+  scale_y_continuous(labels = comma) +
+  labs(title = "Elbow Method for Optimal k",
+       subtitle = "Total within-cluster sum of squares",
+       x = "k", y = "Total WSS") +
+  theme_hate()
+
+p_cl1 <- ggplot(sy_cl, aes(x = GINI_COEFFICIENT, y = RATE_PER_100K_TOTAL,
+                             colour = CLUSTER)) +
+  geom_point(alpha = 0.55, size = 2.2) +
+  scale_colour_manual(values = CLUSTER_COLORS, name = "Cluster") +
+  scale_y_continuous(labels = number_format(accuracy = 0.01)) +
+  labs(title = "Gini vs. Rate per 100k",
+       subtitle = "Track 1 — per 100k total population",
+       x = "Gini Coefficient", y = "Incidents per 100k") +
+  theme_hate()
+
+p_cl2 <- ggplot(sy_cl, aes(x = GINI_COEFFICIENT, y = VIOLENT_PCT, colour = CLUSTER)) +
+  geom_point(alpha = 0.55, size = 2.2) +
+  scale_colour_manual(values = CLUSTER_COLORS, name = "Cluster") +
+  labs(title = "Gini vs. % Violent",
+       x = "Gini Coefficient", y = "% Violent Incidents") +
+  theme_hate()
+
+p15 <- (p_elbow | p_cl1 | p_cl2) +
+  plot_annotation(
+    title    = "K-Means State Risk Clustering (k = 4)",
+    subtitle = "Features: rate per 100k total pop., Gini coefficient, % violent (all scaled)",
+    theme    = theme(plot.title    = element_text(face="bold", size=13),
+                     plot.subtitle = element_text(size=10, colour="#555555"))
+  )
+p15
+save_chart(p15, "15_kmeans_clusters.png", width = 15, height = 5)
+```
+
+**Cluster interpretation:** One cluster (typically Cluster 4) contains a small number of observations (~21) with a very high rate (~7.66 per 100k), high Gini (~0.541), and high violent share (~73.6%). This cluster is almost entirely driven by Washington D.C., which has an extremely high Gini coefficient and a small population denominator — making it a structural outlier rather than a substantive finding.
+
+---
+
+## 2. Data Preparation for Classification
+
+Both tree-based models use the incident-level enriched dataset. The target is binary: `IS_VIOLENT`. A stratified 80/20 train/test split ensures class balance is preserved across both sets.
+
+```{r ml-prep}
+classify_bias <- function(b) {
+  b <- str_to_lower(b)
+  case_when(
+    str_detect(b, "gender non-conform")               ~ "Anti-Gender Non-Conforming",
+    str_detect(b, "transgender")                       ~ "Anti-Transgender",
+    str_detect(b, "bisexual")                          ~ "Anti-Bisexual",
+    str_detect(b, "lesbian") & !str_detect(b, "gay")  ~ "Anti-Lesbian",
+    str_detect(b, "lesbian") & str_detect(b, "gay")   ~ "Anti-LGBTQ (General)",
+    str_detect(b, "gay")                               ~ "Anti-Gay (Male)",
+    TRUE                                               ~ "Anti-LGBTQ (Other)"
+  )
+}
+
+ml_data <- enriched |>
+  mutate(
+    BIAS_CATEGORY = classify_bias(BIAS_DESC),
+    IS_VIOLENT    = factor(IS_VIOLENT, levels = c(0, 1),
+                           labels = c("Non-violent", "Violent")),
+    DATA_YEAR     = as.numeric(DATA_YEAR)
+  ) |>
+  select(IS_VIOLENT, BIAS_CATEGORY, LAW_LEVEL, GINI, LOG_TOTAL_POP, DATA_YEAR) |>
+  drop_na()
+
+cat(sprintf("ML dataset: %s rows | Class balance: %s\n",
+            format(nrow(ml_data), big.mark=","),
+            paste(table(ml_data$IS_VIOLENT), collapse = " / ")))
+
+set.seed(99)
+splits   <- initial_split(ml_data, prop = 0.80, strata = IS_VIOLENT)
+df_train <- training(splits)
+df_test  <- testing(splits)
+
+cat(sprintf("Train: %s rows | Test: %s rows\n",
+            format(nrow(df_train), big.mark=","),
+            format(nrow(df_test),  big.mark=",")))
+```
+
+```{r recipe}
+rec <- recipe(IS_VIOLENT ~ ., data = df_train) |>
+  step_string2factor(BIAS_CATEGORY) |>
+  step_novel(BIAS_CATEGORY) |>
+  step_dummy(BIAS_CATEGORY, one_hot = FALSE) |>
+  step_normalize(GINI, LOG_TOTAL_POP, DATA_YEAR)
+```
+
+```{r cv-folds}
+set.seed(42)
+folds <- vfold_cv(df_train, v = 5, strata = IS_VIOLENT)
+```
+
+---
+
+## 3. Decision Tree (Tuned via 5-Fold CV)
+
+The cost-complexity parameter (`cp`) and tree depth are tuned jointly over a regular grid. The best model is selected by F1 score to balance precision and recall on the minority (Violent) class.
+
+```{r decision-tree, cache=TRUE}
+dt_spec <- decision_tree(
+  mode            = "classification",
+  cost_complexity = tune(),
+  tree_depth      = tune(),
+  min_n           = 30
+) |> set_engine("rpart")
+
+dt_wf   <- workflow() |> add_recipe(rec) |> add_model(dt_spec)
+dt_grid <- grid_regular(cost_complexity(), tree_depth(range = c(3, 8)), levels = 4)
+dt_res  <- tune_grid(dt_wf, resamples = folds, grid = dt_grid,
+                     metrics = metric_set(accuracy, roc_auc, f_meas))
+
+best_dt   <- select_best(dt_res, metric = "f_meas")
+final_dt  <- finalize_workflow(dt_wf, best_dt)
+dt_fitted <- fit(final_dt, data = df_train)
+
+dt_preds  <- predict(dt_fitted, df_test) |>
+  bind_cols(predict(dt_fitted, df_test, type = "prob")) |>
+  bind_cols(df_test |> select(IS_VIOLENT))
+
+dt_metrics <- dt_preds |>
+  metrics(truth = IS_VIOLENT, estimate = .pred_class, .pred_Violent) |>
+  filter(.metric %in% c("accuracy", "roc_auc"))
+```
+
+```{r dt-results}
+cat(sprintf("Best cp = %.6f | Best depth = %d\n",
+            best_dt$cost_complexity, best_dt$tree_depth))
+dt_metrics |> knitr::kable(digits = 4, caption = "Decision Tree test-set metrics")
+
+dt_preds |>
+  conf_mat(truth = IS_VIOLENT, estimate = .pred_class) |>
+  autoplot(type = "heatmap") +
+  labs(title = "Decision Tree — Confusion Matrix") +
+  theme_hate()
+
+add_result("2. Decision Tree", capture.output(print(dt_metrics)),
+           capture.output(print(conf_mat(dt_preds, IS_VIOLENT, .pred_class))))
+```
+
+---
+
+## 4. Random Forest (200 Trees, Tuned via 5-Fold CV)
+
+`mtry` (features sampled per split) and `min_n` (minimum node size) are tuned. 200 trees strike a balance between stability and compute time. Feature importance uses Mean Decrease in Accuracy (permutation importance), which is more interpretable than Gini importance.
+
+```{r random-forest, cache=TRUE}
+rf_spec <- rand_forest(
+  mode  = "classification",
+  trees = 200,
+  mtry  = tune(),
+  min_n = tune()
+) |> set_engine("randomForest", importance = TRUE)
+
+rf_wf   <- workflow() |> add_recipe(rec) |> add_model(rf_spec)
+rf_grid <- grid_regular(mtry(range = c(2L, 4L)), min_n(range = c(20L, 50L)), levels = 3)
+rf_res  <- tune_grid(rf_wf, resamples = folds, grid = rf_grid,
+                     metrics = metric_set(accuracy, roc_auc, f_meas))
+
+best_rf   <- select_best(rf_res, metric = "f_meas")
+final_rf  <- finalize_workflow(rf_wf, best_rf)
+rf_fitted <- fit(final_rf, data = df_train)
+
+rf_preds  <- predict(rf_fitted, df_test) |>
+  bind_cols(predict(rf_fitted, df_test, type = "prob")) |>
+  bind_cols(df_test |> select(IS_VIOLENT))
+
+rf_metrics <- rf_preds |>
+  metrics(truth = IS_VIOLENT, estimate = .pred_class, .pred_Violent) |>
+  filter(.metric %in% c("accuracy", "roc_auc"))
+```
+
+```{r rf-results}
+cat(sprintf("Best mtry = %d | Best min_n = %d\n", best_rf$mtry, best_rf$min_n))
+rf_metrics |> knitr::kable(digits = 4, caption = "Random Forest test-set metrics")
+
+rf_preds |>
+  conf_mat(truth = IS_VIOLENT, estimate = .pred_class) |>
+  autoplot(type = "heatmap") +
+  labs(title = "Random Forest — Confusion Matrix") +
+  theme_hate()
+
+add_result("3. Random Forest (200 trees)", capture.output(print(rf_metrics)),
+           capture.output(print(conf_mat(rf_preds, IS_VIOLENT, .pred_class))))
+```
+
+---
+
+## 5. Feature Importance
+
+Permutation importance (`MeanDecreaseAccuracy`) shows how much model accuracy drops when each feature is randomly shuffled. Larger drops = more important feature.
+
+```{r feature-importance}
+rf_engine <- extract_fit_engine(rf_fitted)
+imp_raw   <- importance(rf_engine, type = 1)
+
+imp_df <- tibble(
+  Feature    = rownames(imp_raw),
+  Importance = imp_raw[, 1]
+) |>
+  mutate(Feature = str_replace_all(Feature, "_X\\.", "_") |>
+           str_replace_all("BIAS_CATEGORY_", "") |>
+           str_replace_all("\\.", " ") |>
+           str_to_title()) |>
+  arrange(desc(Importance))
+
+imp_df |> slice_max(Importance, n = 10) |>
+  knitr::kable(digits = 4, caption = "Top 10 features — Mean Decrease Accuracy")
+
+add_result("4. RF Feature Importance:", capture.output(print(imp_df)))
+```
+
+```{r chart-17}
+p17 <- ggplot(imp_df |> slice_max(Importance, n = 10) |>
+                mutate(Feature = fct_reorder(Feature, Importance)),
+              aes(x = Importance, y = Feature, fill = Importance > 0)) +
+  geom_col(alpha = 0.85, width = 0.7) +
+  scale_fill_manual(values = c("TRUE"="#B71C1C","FALSE"="#546E7A"), guide="none") +
+  scale_x_continuous(labels = number_format(accuracy = 0.001),
+                     expand = expansion(mult = c(0, 0.12))) +
+  labs(title    = "Random Forest Feature Importance (Top 10)",
+       subtitle = "Mean Decrease in Accuracy | LOG_TOTAL_POP = log(total state population)",
+       x = "Mean Decrease Accuracy", y = NULL) +
+  theme_hate()
+
+p17
+save_chart(p17, "17_feature_importance.png", width = 9, height = 5)
+```
+
+---
+
+## 6. Model Comparison
+
+```{r model-comparison}
+compare_df <- bind_rows(
+  dt_preds |> metrics(truth = IS_VIOLENT, estimate = .pred_class) |>
+    mutate(Model = "Decision Tree"),
+  rf_preds |> metrics(truth = IS_VIOLENT, estimate = .pred_class) |>
+    mutate(Model = "Random Forest (200 trees)")
+) |>
+  filter(.metric %in% c("accuracy", "kap")) |>
+  select(Model, Metric = .metric, Value = .estimate)
+
+f1_dt <- f_meas(dt_preds, truth = IS_VIOLENT, estimate = .pred_class)$.estimate
+f1_rf <- f_meas(rf_preds, truth = IS_VIOLENT, estimate = .pred_class)$.estimate
+
+compare_df <- bind_rows(
+  compare_df,
+  tibble(Model = "Decision Tree",             Metric = "f1", Value = f1_dt),
+  tibble(Model = "Random Forest (200 trees)", Metric = "f1", Value = f1_rf)
+) |>
+  mutate(Metric = factor(Metric, levels = c("accuracy","kap","f1"),
+                         labels = c("Accuracy","Kappa","F1 Score")))
+
+compare_df |>
+  knitr::kable(digits = 4, caption = "Model comparison — test set metrics")
+```
+
+```{r chart-16}
+p16 <- ggplot(compare_df, aes(x = Metric, y = Value, fill = Model)) +
+  geom_col(position = "dodge", width = 0.55, alpha = 0.85) +
+  geom_text(aes(label = number(Value, accuracy = 0.001)),
+            position = position_dodge(width = 0.55), vjust = -0.4, size = 3.2) +
+  scale_fill_manual(values = c("Decision Tree"="#1565C0",
+                                "Random Forest (200 trees)"="#E65100"), name = NULL) +
+  scale_y_continuous(limits = c(0, 1), labels = percent_format(accuracy = 1),
+                     expand = expansion(mult = c(0, 0.12))) +
+  labs(title    = "Model Performance — Predicting Violent vs. Non-Violent Incident",
+       subtitle = "Test set (20% holdout), stratified split",
+       x = NULL, y = "Score") +
+  theme_hate() + theme(legend.position = "top")
+
+p16
+save_chart(p16, "16_model_comparison.png", width = 9, height = 5)
+```
+
+---
+
+## Write Report
+
+```{r write-report}
+writeLines(report_lines, file.path(REPORTS_DIR, "ml_results.txt"))
+cat("✓ ML analysis complete.\n")
+cat("  Report → reports/ml_results.txt\n")
+cat("  Charts → 15_kmeans_clusters.png, 16_model_comparison.png, 17_feature_importance.png\n")
+```
+
+---
+
+## Limitations
+
+- **Low ROC AUC** (both models < 0.5): predicting incident-level violence from aggregate socioeconomic features is inherently difficult. Situational factors that drive whether a hate crime is violent (weapon availability, confrontation type) are not captured at the state-year level. Treat the models as feature-screening tools, not predictors.
+
+- **Imbalanced classes**: Non-violent incidents outnumber violent ones. The 5-fold CV with F1 as the tuning metric partially mitigates this, but the confusion matrices show both models lean toward predicting the majority class.
+
+- **Ecological fallacy**: the enriched dataset joins incident-level records with state-year aggregate features (Gini, population, law level). This means every incident in a given state × year gets the same covariate values — individual variation is not captured.
